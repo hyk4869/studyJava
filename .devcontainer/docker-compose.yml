@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker-host.sock
+      - ../..:/workspaces:cached
+      - /etc/docker:/etc/docker:ro
+      - ~/.ssh:/home/vscode/.ssh:ro
+    entrypoint: /usr/local/share/docker-init.sh
+    command: sleep infinity
+
+    env_file:
+      - .env
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:13
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  adminer:
+    image: adminer
+    restart: always
+    command: ['php', '-S', '[::]:4123', '-t', '/var/www/html']
+    environment:
+      - ADMINER_DESIGN=mvt
+      - ADMINER_DEFAULT_SERVER=postgres
+      - ADMINER_DEFAULT_USER=user
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge

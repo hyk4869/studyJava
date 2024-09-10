@@ -1,0 +1,67 @@
+{
+  "name": "studyJava",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "remoteEnv": {
+    "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}",
+    "PATH": "${containerEnv:PATH}:/home/vscode/.yarn/bin"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "version": "latest",
+      "enableNonRootDocker": "true",
+      "moby": "true"
+    },
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17",
+      "distribution": "adoptopenjdk"
+    }
+  },
+  "postCreateCommand": "docker --version && java -version && wget -q -O /workspaces/studyJava/lib/postgresql.jar https://jdbc.postgresql.org/download/postgresql-42.5.0.jar",
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll": "never",
+          "source.fixAll.eslint": "always"
+        }
+      },
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "mhutchie.git-graph",
+        "ms-azuretools.vscode-docker",
+        "hediet.vscode-drawio",
+        "tapio.live-server",
+        "mechatroner.rainbow-csv",
+        "rangav.vscode-thunder-client",
+        "ms-vscode-remote.remote-containers",
+        "ms-azuretools.vscode-docker",
+        "wayou.vscode-todo-highlight",
+        "mtxr.sqltools",
+        "mtxr.sqltools-driver-pg",
+        "redhat.java", // Java language support
+        "vscjava.vscode-java-debug", // Debugger for Java
+        "vscjava.vscode-java-test", // Java Test Runner
+        "vscjava.vscode-maven", // Maven support
+        "vscjava.vscode-java-dependency", // Java Dependency Viewer
+        "vscjava.vscode-java-pack" // Java Extension Pack
+      ]
+    }
+  },
+  "portsAttributes": {
+    "backend:3500": {
+      "label": "Backend",
+      "onAutoForward": "ignore"
+    },
+    "adminer:4123": {
+      "label": "Adminer",
+      "onAutoForward": "ignore"
+    }
+  },
+  "forwardPorts": [3500, "adminer:4125"],
+  "mounts": ["source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"]
+}

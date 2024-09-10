@@ -1,0 +1,58 @@
+{
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.colorTheme": "Default Dark+",
+  "editor.formatOnSave": true,
+  "prettier.printWidth": 120,
+  "editor.scrollbar.verticalScrollbarSize": 20,
+  "editor.scrollbar.horizontalScrollbarSize": 20,
+  "javascript.preferences.quoteStyle": "single",
+  "typescript.preferences.quoteStyle": "single",
+  "prettier.jsxSingleQuote": true,
+  "prettier.singleQuote": true,
+  "git.confirmSync": false,
+  "files.autoGuessEncoding": true,
+  "hediet.vscode-drawio.resizeImages": null,
+  "editor.wordWrapColumn": 120,
+  "window.zoomLevel": -1,
+  "eslint.options": {
+    "extensions": [".js", ".jsx", ".ts", ".tsx", ".graphql"]
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.fontFamily": "Consolas, 'Courier New', monospace",
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#db71f8",
+    "activityBar.foreground": "#FFFFFF",
+    "activityBarBadge.background": "#007ACC",
+    "activityBarBadge.foreground": "#FFFFFF",
+    "sideBar.background": "#252526",
+    "sideBar.foreground": "#CCCCCC",
+    "sideBarSectionHeader.background": "#333333",
+    "sideBarSectionHeader.foreground": "#FFFFFF",
+    "editorGroupHeader.tabsBackground": "#252526",
+    "tab.activeBackground": "#064773",
+    "tab.activeForeground": "#FFFFFF",
+    "tab.inactiveBackground": "#2D2D2D",
+    "tab.inactiveForeground": "#CCCCCC",
+    "tab.border": "#1E1E1E",
+    "statusBar.background": "#007ACC",
+    "statusBar.foreground": "#FFFFFF",
+    "statusBar.noFolderBackground": "#68217A",
+    "statusBar.noFolderForeground": "#FFFFFF",
+    "statusBar.debuggingBackground": "#007ACC",
+    "statusBar.debuggingForeground": "#FFFFFF",
+    "titleBar.activeBackground": "#d450f9",
+    "titleBar.activeForeground": "#FFFFFF",
+    "titleBar.inactiveBackground": "#d450f9",
+    "titleBar.inactiveForeground": "#CCCCCC"
+  },
+
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.trimAutoWhitespace": true,
+  "editor.minimap.enabled": false,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true
+}
