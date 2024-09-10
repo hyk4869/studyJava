@@ -54,5 +54,16 @@
   "editor.trimAutoWhitespace": true,
   "editor.minimap.enabled": false,
   "files.trimTrailingWhitespace": true,
-  "files.insertFinalNewline": true
+  "files.insertFinalNewline": true,
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "postgres",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "PostgreSQL",
+      "database": "mydb",
+      "username": "user"
+    }
+  ]
 }

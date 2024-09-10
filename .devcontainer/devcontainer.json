@@ -57,7 +57,7 @@
       "label": "Backend",
       "onAutoForward": "ignore"
     },
-    "adminer:4123": {
+    "adminer:4125": {
       "label": "Adminer",
       "onAutoForward": "ignore"
     }
