@@ -20,6 +20,13 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always"
   },
+  "[java]": {
+    "editor.defaultFormatter": "redhat.java",
+    "editor.formatOnSave": true
+  },
+  "java.format.settings.url": "./eclipse-formatter.xml",
+  "java.format.settings.profile": "Eclipse",
+
   "terminal.integrated.fontSize": 14,
   "terminal.integrated.fontFamily": "Consolas, 'Courier New', monospace",
   "workbench.colorCustomizations": {
