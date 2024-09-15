@@ -23,7 +23,7 @@
   "terminal.integrated.fontSize": 14,
   "terminal.integrated.fontFamily": "Consolas, 'Courier New', monospace",
   "workbench.colorCustomizations": {
-    "activityBar.background": "#db71f8",
+    "activityBar.background": "#9258a3",
     "activityBar.foreground": "#FFFFFF",
     "activityBarBadge.background": "#007ACC",
     "activityBarBadge.foreground": "#FFFFFF",
@@ -43,9 +43,9 @@
     "statusBar.noFolderForeground": "#FFFFFF",
     "statusBar.debuggingBackground": "#007ACC",
     "statusBar.debuggingForeground": "#FFFFFF",
-    "titleBar.activeBackground": "#d450f9",
+    "titleBar.activeBackground": "#9258a3",
     "titleBar.activeForeground": "#FFFFFF",
-    "titleBar.inactiveBackground": "#d450f9",
+    "titleBar.inactiveBackground": "#9258a3",
     "titleBar.inactiveForeground": "#CCCCCC"
   },
 
@@ -62,7 +62,7 @@
       "port": 5432,
       "driver": "PostgreSQL",
       "name": "PostgreSQL",
-      "database": "mydb",
+      "database": "sampledb",
       "username": "user"
     }
   ]
