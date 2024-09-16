@@ -10,3 +10,5 @@ CREATE TABLE "T_TodoCategory" (
   todoId VARCHAR(32) NOT NULL REFERENCES "T_TodoList"(id) ON DELETE CASCADE,
   categoryId VARCHAR(32) NOT NULL REFERENCES "T_Category"(id) ON DELETE CASCADE
 );
+
+-- DROP TABLE "T_TodoCategory"
