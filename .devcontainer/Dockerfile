@@ -5,6 +5,9 @@ RUN apt-get update && apt-get install -y \
     bash \
     locales \
     tzdata \
+    x11-apps \
+    libxtst6 \
+    libfreetype6 \
     && echo "ja_JP.UTF-8 UTF-8" > /etc/locale.gen \
     && locale-gen ja_JP.UTF-8 \
     && update-locale LANG=ja_JP.UTF-8 \
