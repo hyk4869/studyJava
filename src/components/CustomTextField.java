@@ -4,12 +4,12 @@ import javax.swing.BorderFactory;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import src.utils.CommonColor;
 import src.utils.CommonFont;
 import src.utils.CommonPadding;
@@ -22,11 +22,10 @@ public class CustomTextField extends JTextField {
     OUTLINED, STANDARD
   }
 
-  /** outlinedのスタイル保持 */
+  /** OUTLINEDのスタイル保持 */
   private final Border outlinedBorder;
-  /** standardのスタイル保持 */
+  /** STANDARDのスタイル保持 */
   private final Border standardBorder;
-
   /** STANDARDスタイル用のフォーカスボーダー */
   private final Border standardFocusBorder;
   /** STANDARDスタイル用のホバーボーダー */
@@ -35,7 +34,6 @@ public class CustomTextField extends JTextField {
   private final Border otherFocusBorder;
   /** OUTLINEDとFILLED用のホバーボーダー */
   private final Border otherHoverBorder;
-
   /** スタイルを保持 */
   private final TextFieldStyle style;
 
@@ -46,44 +44,43 @@ public class CustomTextField extends JTextField {
   private final CommonFont commonFont = new CommonFont();
 
   // コンストラクタ
-  public CustomTextField(int columns, TextFieldStyle style) {
+  public CustomTextField(int columns, TextFieldStyle style, int fontSize) {
     super(columns);
     this.style = style;
 
-    outlinedBorder = BorderFactory.createCompoundBorder(
-        BorderFactory.createLineBorder(commonColor.commonGray(), 1, true),
-        commonPadding.paddingBorder());
+    // ボーダーの初期化
+    outlinedBorder = createBorder(commonColor.commonGray(), 1, true);
+    standardBorder = createMatteBorder(commonColor.commonGray(), 1);
+    standardFocusBorder = createMatteBorder(commonColor.commonBlue(), 2);
+    standardHoverBorder = createMatteBorder(commonColor.commonBlack(), 2);
 
-    standardBorder = BorderFactory.createCompoundBorder(
-        BorderFactory.createMatteBorder(0, 0, 1, 0, commonColor.commonGray()),
-        commonPadding.paddingBorder());
+    otherFocusBorder = createBorder(commonColor.commonBlue(), 2, true);
+    otherHoverBorder = createBorder(commonColor.commonBlack(), 2, true);
 
-    standardFocusBorder = BorderFactory.createCompoundBorder(
-        BorderFactory.createMatteBorder(0, 0, 2, 0, commonColor.commonBlue()),
-        commonPadding.paddingBorder());
+    customizeTextField(fontSize);
+  }
 
-    standardHoverBorder = BorderFactory.createCompoundBorder(
-        BorderFactory.createMatteBorder(0, 0, 2, 0, commonColor.commonBlack()),
+  /** ボーダーを作成する共通メソッド */
+  private Border createBorder(Color color, int thickness, boolean roundedCorners) {
+    return BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(color, thickness, roundedCorners),
         commonPadding.paddingBorder());
+  }
 
-    otherFocusBorder = BorderFactory.createCompoundBorder(
-        BorderFactory.createLineBorder(commonColor.commonBlue(), 2, true),
+  /** マットボーダーを作成する共通メソッド */
+  private Border createMatteBorder(Color color, int thickness) {
+    return BorderFactory.createCompoundBorder(
+        BorderFactory.createMatteBorder(0, 0, thickness, 0, color),
         commonPadding.paddingBorder());
-
-    otherHoverBorder = BorderFactory.createCompoundBorder(
-        BorderFactory.createLineBorder(commonColor.commonBlack(), 2, true),
-        commonPadding.paddingBorder());
-
-    customizeTextField();
   }
 
   /** JTextField内をカスタマイズ */
-  private void customizeTextField() {
+  private void customizeTextField(int fontSize) {
     // プレースホルダーのような効果を追加
     this.setToolTipText("Enter your ToDo here...");
 
     // カスタムのフォントを設定
-    this.setFont(commonFont.commonArialFont(14));
+    this.setFont(commonFont.commonArialFont(fontSize));
 
     // サイズを設定
     this.setPreferredSize(new Dimension(200, 40));
@@ -92,11 +89,15 @@ public class CustomTextField extends JTextField {
     switch (style) {
       case OUTLINED:
         this.setBorder(outlinedBorder);
-        this.setBackground(commonColor.commonWhite());
+        // this.setBackground(commonColor.commonWhite());
+        this.setOpaque(false); // 背景を透明にする
+
         break;
       case STANDARD:
         this.setBorder(standardBorder);
-        this.setBackground(commonColor.commonWhite());
+        // this.setBackground(commonColor.commonWhite());
+        this.setOpaque(false); // 背景を透明にする
+
         break;
     }
 
