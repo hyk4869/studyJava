@@ -4,8 +4,8 @@ import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import java.util.Arrays;
 import src.tab.CommonTab;
-import src.tabPannels.SearchTodoPannel;
-import src.tabPannels.TodoListPannel;
+import src.views.SearchTodoPannel;
+import src.views.TodoListPannel;
 
 public class TodoApp {
   public static void main(String[] args) {

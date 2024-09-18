@@ -1,0 +1,35 @@
+package src.components.labels;
+
+import javax.swing.*;
+import java.awt.*;
+
+public class CustomLabeledComponent extends JPanel {
+
+  private final JLabel label;
+
+  // コンストラクタ
+  public CustomLabeledComponent(String labelText, JComponent component) {
+    this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); // 垂直に配置
+
+    // ラベルを作成
+    label = new JLabel(labelText);
+    label.setAlignmentX(Component.LEFT_ALIGNMENT); // 左寄せ
+
+    // 渡されたコンポーネントをこのパネルに追加
+    component.setAlignmentX(Component.LEFT_ALIGNMENT); // 左寄せ
+
+    // ラベルとコンポーネントをこのパネルに追加
+    this.add(label);
+    this.add(component);
+  }
+
+  // ラベルを取得
+  public JLabel getLabel() {
+    return label;
+  }
+
+  // 汎用コンポーネントを取得
+  public JComponent getComponent() {
+    return this;
+  }
+}
