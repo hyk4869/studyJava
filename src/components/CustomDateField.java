@@ -35,11 +35,18 @@ public class CustomDateField extends CustomStyledContents {
     // カスタムボタンを作成（ボタンをここで初期化）
     customEllipsisButton = new JButton("date");
 
+    // ボタンのアクションリスナーをコンストラクタ内で設定
+    customEllipsisButton.addActionListener(e -> {
+      showDatePickerDialog();
+    });
+
     // テキストフィールドをクリックしたら日付ピッカーをダイアログで表示
     this.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
-        showDatePickerDialog();
+        if (getText() == null || getText().trim().isEmpty()) {
+          showDatePickerDialog();
+        }
       }
     });
 
@@ -72,31 +79,30 @@ public class CustomDateField extends CustomStyledContents {
     JFormattedTextField textField = datePicker.getJFormattedTextField();
     textField.setVisible(false); // テキストフィールドを非表示に
 
-    customEllipsisButton.addActionListener(e -> {
-      // カスタムダイアログで日付ピッカーを表示
-      JDialog dialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(this), "Select Date", true);
-      dialog.setLayout(new BorderLayout());
-      dialog.add(datePanel, BorderLayout.CENTER);
-      dialog.pack();
-      dialog.setLocationRelativeTo(this); // ダイアログをテキストフィールドの近くに表示
-      dialog.setVisible(true);
-    });
+    // カスタムダイアログで日付ピッカーを表示
+    JDialog dialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(this), "Select Date", true);
+    dialog.setLayout(new BorderLayout());
+    dialog.add(datePanel, BorderLayout.CENTER);
+    dialog.pack();
+    dialog.setLocationRelativeTo(this); // ダイアログをテキストフィールドの近くに表示
 
-    // 日付選択時にCustomStyledContentsのテキストフィールドに反映
+    // 日付選択時にCustomStyledContentsのテキストフィールドに反映し、ダイアログを閉じる
     datePanel.addActionListener(e -> {
       java.util.Date selectedDate = (java.util.Date) datePicker.getModel().getValue();
       if (selectedDate != null) {
         setText(new SimpleDateFormat("yyyy-MM-dd").format(selectedDate));
       }
+      dialog.dispose();
     });
 
-    // カスタムボタンをCustomStyledContentsに追加（再追加が必要な場合）
+    dialog.setVisible(true);
+
     if (customEllipsisButton.getParent() == null) {
       this.setLayout(new BorderLayout());
       this.add(customEllipsisButton, BorderLayout.EAST);
     }
 
-    customEllipsisButton.setVisible(true); // ボタンを表示
+    customEllipsisButton.setVisible(true);
     this.revalidate();
     this.repaint();
   }
