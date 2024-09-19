@@ -15,6 +15,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
+import java.util.Locale;
+
 import src.components.enums.TextFieldStyle;
 import src.components.styles.CustomStyledContents;
 
@@ -69,18 +71,23 @@ public class CustomDateField extends CustomStyledContents {
     // 日付ピッカーを作成
     SqlDateModel model = new SqlDateModel();
     Properties p = new Properties();
-    p.put("text.today", "Today");
-    p.put("text.month", "Month");
-    p.put("text.year", "Year");
+    p.put("text.today", "今日");
+    p.put("text.month", "月");
+    p.put("text.year", "年");
     JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
     JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
 
+    datePicker.setLocale(Locale.JAPAN);
+
     // JDatePickerImplのテキストフィールドを非表示にする
     JFormattedTextField textField = datePicker.getJFormattedTextField();
-    textField.setVisible(false); // テキストフィールドを非表示に
+    textField.setVisible(false); // テキストフィールドを非表示
+
+    datePanel.setBackground(Color.LIGHT_GRAY); // Change to desired color
+    datePanel.setForeground(Color.BLACK);
 
     // カスタムダイアログで日付ピッカーを表示
-    JDialog dialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(this), "Select Date", true);
+    JDialog dialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(this), "日付を選択", true);
     dialog.setLayout(new BorderLayout());
     dialog.add(datePanel, BorderLayout.CENTER);
     dialog.pack();

@@ -35,7 +35,7 @@ public class CommonTab {
     // タブの高さを変更
     UIManager.put("TabbedPane.tabInsets", new javax.swing.plaf.InsetsUIResource(10, 20, 10, 20));
     // フォントの設定
-    UIManager.put("TabbedPane.font", new FontUIResource(commonFont.commonArialFont(14)));
+    UIManager.put("TabbedPane.font", new FontUIResource(commonFont.commonNotoSansCJKJP(14)));
   }
 
   /** テキストフィールドの追加 */
@@ -94,7 +94,7 @@ public class CommonTab {
    * @param fieldConfigs
    * @param style
    * @param columns
-   *          テキストフィールドを配置する列数
+   *                     テキストフィールドを配置する列数
    * @return innerPanelを返すことで、外部からボタンを追加できるようにする
    */
   public JPanel addTab(JTabbedPane tabbedPane, String title, Map<String, String> fieldConfigs, TextFieldStyle style,

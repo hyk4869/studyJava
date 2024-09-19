@@ -27,7 +27,7 @@ public class SearchTodoPannel {
     fieldConfigs.put("createdAt", "date");
     fieldConfigs.put("updatedAt", "date");
     fieldConfigs.put("isCompleted", "text");
-    fieldConfigs.put("sort", "numeric");
+    fieldConfigs.put("ソート", "numeric");
 
     CommonTab commonTab = new CommonTab();
 

@@ -69,7 +69,7 @@ public abstract class CustomStyledContents extends JFormattedTextField {
 
   /** JTextField内をカスタマイズ */
   private void customizeTextField(int fontSize) {
-    this.setFont(commonFont.commonArialFont(fontSize));
+    this.setFont(commonFont.commonNotoSansCJKJP(fontSize));
     this.setPreferredSize(new Dimension(200, 40));
 
     // スタイルに応じた初期設定
