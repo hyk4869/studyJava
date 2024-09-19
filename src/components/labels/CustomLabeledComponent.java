@@ -23,12 +23,10 @@ public class CustomLabeledComponent extends JPanel {
     this.add(component);
   }
 
-  // ラベルを取得
   public JLabel getLabel() {
     return label;
   }
 
-  // 汎用コンポーネントを取得
   public JComponent getComponent() {
     return this;
   }

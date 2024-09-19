@@ -6,8 +6,9 @@ import org.jdatepicker.impl.SqlDateModel;
 
 import javax.swing.*;
 import javax.swing.text.DateFormatter;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.DateFormat;
@@ -20,9 +21,10 @@ import src.components.styles.CustomStyledContents;
 /** 日付のinput */
 public class CustomDateField extends CustomStyledContents {
 
-  private JDatePickerImpl datePicker; // 日付ピッカーのインスタンス
+  // フィールド
+  private JButton customEllipsisButton;
 
-  // コンストラクタ
+  /** コンストラクタ */
   public CustomDateField(int columns, TextFieldStyle style, int fontSize) {
     super(style, fontSize);
     setFormatter(createFormatter());
@@ -30,53 +32,85 @@ public class CustomDateField extends CustomStyledContents {
     // カラム数を設定
     this.setColumns(columns);
 
-    // 日付ピッカーを作成
-    createDatePicker();
+    // カスタムボタンを作成（ボタンをここで初期化）
+    customEllipsisButton = new JButton("date");
+
+    // テキストフィールドをクリックしたら日付ピッカーをダイアログで表示
+    this.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        showDatePickerDialog();
+      }
+    });
+
+    // フォーカスが外れたらボタンを非表示に
+    this.addFocusListener(new FocusListener() {
+      @Override
+      public void focusGained(FocusEvent e) {
+        customEllipsisButton.setVisible(true);
+      }
+
+      @Override
+      public void focusLost(FocusEvent e) {
+        customEllipsisButton.setVisible(false);
+      }
+    });
   }
 
-  // 日付ピッカーを作成し、クリック時に表示するように設定
-  private void createDatePicker() {
+  /** 日付ピッカーの表示 */
+  private void showDatePickerDialog() {
+    // 日付ピッカーを作成
     SqlDateModel model = new SqlDateModel();
     Properties p = new Properties();
     p.put("text.today", "Today");
     p.put("text.month", "Month");
     p.put("text.year", "Year");
     JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
-    datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
+    JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
 
-    // 日付フィールドをクリックしたら独立したダイアログを表示
-    this.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseClicked(MouseEvent e) {
-        SwingUtilities.invokeLater(() -> {
-          JDialog dialog = new JDialog();
-          dialog.setTitle("Select Date");
-          dialog.setModal(true); // モーダルダイアログとして設定
-          dialog.getContentPane().add(datePicker);
-          dialog.pack();
-          dialog.setLocationRelativeTo(null); // 画面中央に表示
-          dialog.setVisible(true);
+    // JDatePickerImplのテキストフィールドを非表示にする
+    JFormattedTextField textField = datePicker.getJFormattedTextField();
+    textField.setVisible(false); // テキストフィールドを非表示に
 
-          // ダイアログが閉じられたら選択した日付を設定
-          if (datePicker.getModel().getValue() != null) {
-            setText(datePicker.getJFormattedTextField().getText());
-          }
-        });
+    customEllipsisButton.addActionListener(e -> {
+      // カスタムダイアログで日付ピッカーを表示
+      JDialog dialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(this), "Select Date", true);
+      dialog.setLayout(new BorderLayout());
+      dialog.add(datePanel, BorderLayout.CENTER);
+      dialog.pack();
+      dialog.setLocationRelativeTo(this); // ダイアログをテキストフィールドの近くに表示
+      dialog.setVisible(true);
+    });
+
+    // 日付選択時にCustomStyledContentsのテキストフィールドに反映
+    datePanel.addActionListener(e -> {
+      java.util.Date selectedDate = (java.util.Date) datePicker.getModel().getValue();
+      if (selectedDate != null) {
+        setText(new SimpleDateFormat("yyyy-MM-dd").format(selectedDate));
       }
     });
 
+    // カスタムボタンをCustomStyledContentsに追加（再追加が必要な場合）
+    if (customEllipsisButton.getParent() == null) {
+      this.setLayout(new BorderLayout());
+      this.add(customEllipsisButton, BorderLayout.EAST);
+    }
+
+    customEllipsisButton.setVisible(true); // ボタンを表示
+    this.revalidate();
+    this.repaint();
   }
 
-  // 日付フォーマッターを作成
+  /** 日付フォーマッターを作成 */
   private static DateFormatter createFormatter() {
-    DateFormat format = new SimpleDateFormat("yyyy-MM-dd"); // 日付フォーマットを設定
+    DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     DateFormatter formatter = new DateFormatter(format) {
       @Override
       public Object stringToValue(String text) throws ParseException {
         if (text == null || text.trim().isEmpty()) {
-          return null; // テキストが空の場合はnullを返す
+          return null;
         }
-        return super.stringToValue(text); // 有効な日付の場合は通常のパースを行う
+        return super.stringToValue(text);
       }
     };
 
@@ -85,7 +119,7 @@ public class CustomDateField extends CustomStyledContents {
     return formatter;
   }
 
-  // DateLabelFormatterの内部クラス
+  /** DateLabelFormatterの内部クラス */
   private class DateLabelFormatter extends DateFormatter {
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -96,7 +130,7 @@ public class CustomDateField extends CustomStyledContents {
 
     @Override
     public String valueToString(Object value) {
-      if (value != null) {
+      if (value instanceof java.util.Date) {
         return dateFormat.format(value);
       }
       return "";
