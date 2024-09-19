@@ -10,7 +10,7 @@
   "prettier.jsxSingleQuote": true,
   "prettier.singleQuote": true,
   "git.confirmSync": false,
-  "files.autoGuessEncoding": true,
+  // "files.autoGuessEncoding": true,
   "hediet.vscode-drawio.resizeImages": null,
   "editor.wordWrapColumn": 120,
   "window.zoomLevel": -1,
@@ -24,7 +24,9 @@
     "editor.defaultFormatter": "redhat.java",
     "editor.formatOnSave": true
   },
-  "java.format.settings.url": "./eclipse-formatter.xml",
+  "files.encoding": "utf8",
+  "files.autoGuessEncoding": false,
+  "java.format.settings.url": "/workspaces/${localWorkspaceFolderBasename}/eclipse-formatter.xml",
   "java.format.settings.profile": "Eclipse",
 
   "terminal.integrated.fontSize": 14,

@@ -1,0 +1,33 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "CustomFrame",
+      "request": "launch",
+      "mainClass": "src.components.frame.CustomFrame",
+      "projectName": "studyJava_301f17e9"
+    },
+    {
+      "type": "java",
+      "name": "TodoApp",
+      "request": "launch",
+      "mainClass": "src.TodoApp",
+      "projectName": "studyJava_301f17e9",
+      "vmArgs": "-Dfile.encoding=UTF-8 -Dawt.useSystemAAFontSettings=lcd -Dswing.aatext=true"
+    }
+  ]
+}
+// {
+//   "version": "0.2.0",
+//   "configurations": [
+//     {
+//       "type": "java",
+//       "name": "TodoApp",
+//       "request": "launch",
+//       "mainClass": "src.TodoApp",
+//       "vmArgs": "-Dfile.encoding=UTF-8 -Dawt.useSystemAAFontSettings=lcd -Dswing.aatext=true",
+//       "projectName": "studyJava_301f17e9",
+//       "console": "internalConsole"
+//     }
+//   ]
+// }
