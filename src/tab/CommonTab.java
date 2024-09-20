@@ -6,11 +6,13 @@ import javax.swing.JTextField;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
+
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +26,7 @@ import src.utils.CommonFont;
 
 public class CommonTab {
   /** テキストフィールドのリスト */
-
+  private Map<String, JTextField> textFieldMap = new HashMap<>();
   private List<CustomLabeledComponent> components = new ArrayList<>();
 
   private final CreatePannel createPannel = new CreatePannel();
@@ -49,17 +51,24 @@ public class CommonTab {
       String fieldType = entry.getValue();
 
       CustomLabeledComponent labeledComponent;
+      JTextField textField;
 
       // フィールドタイプに応じてコンポーネントを選択
       if ("numeric".equalsIgnoreCase(fieldType)) {
         CustomNumericField numericField = new CustomNumericField(20, style, 14);
         labeledComponent = new CustomLabeledComponent(labelText, numericField);
+        textField = numericField;
+
       } else if ("date".equalsIgnoreCase(fieldType)) {
         CustomDateField dateField = new CustomDateField(20, style, 14);
         labeledComponent = new CustomLabeledComponent(labelText, dateField);
+        textField = dateField;
+
       } else {
-        CustomTextField textField = new CustomTextField(20, style, 14);
-        labeledComponent = new CustomLabeledComponent(labelText, textField);
+        CustomTextField textFieldStandard = new CustomTextField(20, style, 14);
+        labeledComponent = new CustomLabeledComponent(labelText, textFieldStandard);
+        textField = textFieldStandard;
+
       }
 
       innerGbc.gridx = index % columns; // 指定された列数に基づいて配置
@@ -70,20 +79,58 @@ public class CommonTab {
       innerPanel.add(labeledComponent, innerGbc);
 
       components.add(labeledComponent);
+
+      System.out.println("Adding field to textFieldMap: " + labelText);
+
+      textFieldMap.put(labelText, textField);
+
       index++;
     }
   }
 
+  /** フィールドの値を取得する */
+  public String getFieldValue(String fieldName) {
+    JTextField textField = textFieldMap.get(fieldName);
+    return textField != null ? textField.getText() : "";
+  }
+
+  /** フィールドの値を設定する */
+  public void setFieldValue(String fieldName, String value) {
+    JTextField textField = textFieldMap.get(fieldName);
+    if (textField != null) {
+      textField.setText(value);
+    }
+  }
+
+  /** タブパネルを作成して返す */
+  public JPanel createInnerPanel(String title, Map<String, String> fieldConfigs, TextFieldStyle style, int columns) {
+    JPanel innerPanel = createPannel.createInnerPanel(title);
+    addFields(innerPanel, fieldConfigs, style, columns);
+    return innerPanel;
+  }
+
   /** 内部パネルをメインパネルに追加 */
-  private void addInnerPanelToMain(JPanel mainPanel, JPanel innerPanel) {
+  private void addInnerPanelToMain(JPanel mainPanel, JPanel innerPanel, int position) {
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.gridx = 0;
-    gbc.gridy = 0;
-    gbc.gridwidth = 2; // 内部パネルの幅に広げる
+    gbc.gridy = position; // 位置を指定する
+    gbc.gridwidth = GridBagConstraints.REMAINDER; // パネルの幅全体を使う
     gbc.insets = new Insets(0, 10, 0, 10); // 左右のマージンを10に設定
     gbc.fill = GridBagConstraints.HORIZONTAL; // 横方向に広げる
-    gbc.weightx = 1.0; // 余分なスペースがあれば横方向に広げる
+    gbc.weightx = 1.0; // 横方向に余分なスペースを与え、均等に広げる
+    gbc.weighty = 0.0; // 縦方向のスペースを余分に与えない
+    gbc.anchor = GridBagConstraints.NORTH; // 上に配置
+
     mainPanel.add(innerPanel, gbc);
+
+    // メインパネルが上詰めになるように設定
+    GridBagConstraints fillerGbc = new GridBagConstraints();
+    fillerGbc.gridx = 0;
+    fillerGbc.gridy = position + 1; // 次の行にスペースを追加
+    fillerGbc.weightx = 1.0;
+    fillerGbc.weighty = 1.0; // 縦方向に余分なスペースを与える
+    fillerGbc.fill = GridBagConstraints.BOTH; // 余白を埋める
+    mainPanel.add(new JPanel(), fillerGbc); // 余分なスペースを埋めるためのダミーパネルを追加
   }
 
   /**
@@ -98,12 +145,12 @@ public class CommonTab {
    * @return innerPanelを返すことで、外部からボタンを追加できるようにする
    */
   public JPanel addTab(JTabbedPane tabbedPane, String title, Map<String, String> fieldConfigs, TextFieldStyle style,
-      int columns) {
+      int columns, int position) {
     JPanel mainPanel = createPannel.createMainPanel();
     JPanel innerPanel = createPannel.createInnerPanel(title);
 
     addFields(innerPanel, fieldConfigs, style, columns);
-    addInnerPanelToMain(mainPanel, innerPanel);
+    addInnerPanelToMain(mainPanel, innerPanel, position);
 
     tabbedPane.addTab(title, mainPanel);
 

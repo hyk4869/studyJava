@@ -2,7 +2,7 @@ package src.views;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.JPanel;
@@ -14,27 +14,21 @@ import src.tab.CommonTab;
 
 public class SearchTodoPannel {
 
+  /** mainメソッドにSearchTodoタブとその中身を生成 */
   public void GenerateSearchTodoTab(JTabbedPane tabbedPane) {
-    // String[] labelTexts = { "Title", "Description", "createdByName",
-    // "updatedByName", "createdAt", "updatedAt",
-    // "isCompleted", "sort" };
-
-    Map<String, String> fieldConfigs = new HashMap<>();
-    fieldConfigs.put("Title", "text");
-    fieldConfigs.put("Description", "text");
+    Map<String, String> fieldConfigs = new LinkedHashMap<>();
+    fieldConfigs.put("title", "text");
+    fieldConfigs.put("description", "text");
     fieldConfigs.put("createdByName", "text");
     fieldConfigs.put("updatedByName", "text");
     fieldConfigs.put("createdAt", "date");
     fieldConfigs.put("updatedAt", "date");
     fieldConfigs.put("isCompleted", "text");
-    fieldConfigs.put("ソート", "numeric");
+    fieldConfigs.put("sort", "numeric");
 
     CommonTab commonTab = new CommonTab();
 
-    // commonTab.addTab(tabbedPane, "Search Todo", labelTexts,
-    // TextFieldStyle.STANDARD, "Search Todo");
-
-    JPanel innerPanel = commonTab.addTab(tabbedPane, "Search Todo", fieldConfigs, TextFieldStyle.STANDARD, 3);
+    JPanel innerPanel = commonTab.addTab(tabbedPane, "Search Todo", fieldConfigs, TextFieldStyle.STANDARD, 3, 1);
 
     // CustomButtonを使ってボタンを追加
     CustomButton customButton = new CustomButton();
