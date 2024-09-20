@@ -3,6 +3,8 @@ package src;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Arrays;
 import java.util.Locale;
 
@@ -36,6 +38,14 @@ public class TodoApp {
     frame.add(tabbedPane);
 
     CommonTab.addFocusListener(frame, Arrays.asList());
+
+    // DBとの接続を切る
+    frame.addWindowListener(new WindowAdapter() {
+      @Override
+      public void windowClosing(WindowEvent e) {
+        connection.closeConnection();
+      }
+    });
 
     frame.setVisible(true);
   }
