@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import src.components.CustomCheckBox;
 import src.components.CustomDateField;
 import src.components.CustomNumericField;
 import src.components.CustomTextField;
@@ -26,7 +27,7 @@ import src.utils.CommonFont;
 
 public class CommonTab {
   /** テキストフィールドのリスト */
-  private Map<String, JTextField> textFieldMap = new HashMap<>();
+  private Map<String, Object> fieldMap = new HashMap<>();
   private List<CustomLabeledComponent> components = new ArrayList<>();
 
   private final CreatePannel createPannel = new CreatePannel();
@@ -51,23 +52,28 @@ public class CommonTab {
       String fieldType = entry.getValue();
 
       CustomLabeledComponent labeledComponent;
-      JTextField textField;
+      Object field = null;
 
       // フィールドタイプに応じてコンポーネントを選択
       if ("numeric".equalsIgnoreCase(fieldType)) {
         CustomNumericField numericField = new CustomNumericField(20, style, 14);
         labeledComponent = new CustomLabeledComponent(labelText, numericField);
-        textField = numericField;
+        field = numericField;
 
       } else if ("date".equalsIgnoreCase(fieldType)) {
         CustomDateField dateField = new CustomDateField(20, style, 14);
         labeledComponent = new CustomLabeledComponent(labelText, dateField);
-        textField = dateField;
+        field = dateField;
+
+      } else if ("check".equalsIgnoreCase(fieldType)) {
+        CustomCheckBox checkBox = new CustomCheckBox("isCompleted");
+        labeledComponent = new CustomLabeledComponent(labelText, checkBox);
+        field = checkBox;
 
       } else {
         CustomTextField textFieldStandard = new CustomTextField(20, style, 14);
         labeledComponent = new CustomLabeledComponent(labelText, textFieldStandard);
-        textField = textFieldStandard;
+        field = textFieldStandard;
 
       }
 
@@ -82,23 +88,33 @@ public class CommonTab {
 
       System.out.println("Adding field to textFieldMap: " + labelText);
 
-      textFieldMap.put(labelText, textField);
+      fieldMap.put(labelText, field);
 
       index++;
     }
   }
 
   /** フィールドの値を取得する */
-  public String getFieldValue(String fieldName) {
-    JTextField textField = textFieldMap.get(fieldName);
-    return textField != null ? textField.getText() : "";
+  public Object getFieldValue(String fieldName) {
+    Object field = fieldMap.get(fieldName);
+
+    if (field instanceof JTextField) {
+      return ((JTextField) field).getText();
+    } else if (field instanceof CustomCheckBox) {
+      return ((CustomCheckBox) field).isChecked(); // Boolean 値を返す
+    }
+
+    return null;
   }
 
   /** フィールドの値を設定する */
-  public void setFieldValue(String fieldName, String value) {
-    JTextField textField = textFieldMap.get(fieldName);
-    if (textField != null) {
-      textField.setText(value);
+  public void setFieldValue(String fieldName, Object value) {
+    Object field = fieldMap.get(fieldName);
+
+    if (field instanceof JTextField) {
+      ((JTextField) field).setText((String) value);
+    } else if (field instanceof CustomCheckBox) {
+      ((CustomCheckBox) field).setChecked((Boolean) value);
     }
   }
 
