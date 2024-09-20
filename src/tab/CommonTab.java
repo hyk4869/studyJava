@@ -86,8 +86,6 @@ public class CommonTab {
 
       components.add(labeledComponent);
 
-      System.out.println("Adding field to textFieldMap: " + labelText);
-
       fieldMap.put(labelText, field);
 
       index++;
