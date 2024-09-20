@@ -10,9 +10,16 @@ import javax.swing.JTabbedPane;
 
 import src.components.CustomButton;
 import src.components.enums.TextFieldStyle;
+import src.dataBase.PostgreSQLConnection;
 import src.tab.CommonTab;
 
 public class SearchTodoPannel {
+
+  private PostgreSQLConnection connection;
+
+  public SearchTodoPannel(PostgreSQLConnection connection) {
+    this.connection = connection;
+  }
 
   /** mainメソッドにSearchTodoタブとその中身を生成 */
   public void GenerateSearchTodoTab(JTabbedPane tabbedPane) {
@@ -23,7 +30,7 @@ public class SearchTodoPannel {
     fieldConfigs.put("updatedByName", "text");
     fieldConfigs.put("createdAt", "date");
     fieldConfigs.put("updatedAt", "date");
-    fieldConfigs.put("isCompleted", "text");
+    fieldConfigs.put("isCompleted", "check");
     fieldConfigs.put("sort", "numeric");
 
     CommonTab commonTab = new CommonTab();

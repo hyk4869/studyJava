@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,13 +22,19 @@ import src.components.enums.TextFieldStyle;
 import src.components.table.CommonTable;
 import src.components.table.override.checkbox.CheckBoxEditor;
 import src.components.table.override.checkbox.CheckBoxRenderer;
-
+import src.dataBase.PostgreSQLConnection;
+import src.dataBase.query.TodoListPannelQuery;
 import src.tab.CommonTab;
 
 public class TodoListPannel implements ActionListener {
 
   private CommonTable commonTable;
   private CommonTab commonTab = new CommonTab();
+  private TodoListPannelQuery todoQuery;
+
+  public TodoListPannel(PostgreSQLConnection connection) {
+    this.todoQuery = new TodoListPannelQuery(connection);
+  }
 
   /** mainメソッドにTodoListタブとその中身を生成 */
   public void GenerateTodoListTab(JTabbedPane tabbedPane) {
@@ -72,6 +81,39 @@ public class TodoListPannel implements ActionListener {
 
     // メインパネルをタブに追加
     tabbedPane.addTab("Add Todo", mainPanel);
+    loadAllTodoItems();
+  }
+
+  /** T_TodoListの全データをロードしてテーブルに追加 */
+  private void loadAllTodoItems() {
+    try {
+      ResultSet resultSet = todoQuery.getAllTodoItems();
+
+      while (resultSet.next()) {
+        addRowToTable(resultSet);
+      }
+
+      // リソース解放
+      resultSet.close();
+    } catch (SQLException ex) {
+      ex.printStackTrace();
+    }
+  }
+
+  /** ResultSetからデータを取得してテーブルに行を追加 */
+  private void addRowToTable(ResultSet resultSet) throws SQLException {
+    ArrayList<Object> rowData = new ArrayList<>();
+    rowData.add(resultSet.getString("title"));
+    rowData.add(resultSet.getString("description"));
+    rowData.add(resultSet.getString("createdByName"));
+    rowData.add(resultSet.getString("updatedByName"));
+    rowData.add(resultSet.getTimestamp("createdAt"));
+    rowData.add(resultSet.getTimestamp("updatedAt"));
+    rowData.add(resultSet.getBoolean("isCompleted"));
+    rowData.add(resultSet.getInt("sort"));
+
+    // テーブルに追加
+    commonTable.addRow(rowData);
   }
 
   @Override
@@ -80,23 +122,39 @@ public class TodoListPannel implements ActionListener {
     String description = (String) commonTab.getFieldValue("description");
     Boolean isCompleted = (Boolean) commonTab.getFieldValue("isCompleted");
 
-    // テーブルに追加
-    ArrayList<Object> rowData = new ArrayList<>();
-    rowData.add(title);
-    rowData.add(description);
-    rowData.add("");
-    rowData.add("");
-    rowData.add("");
-    rowData.add("");
-    rowData.add(isCompleted);
-    rowData.add("");
+    // idやその他の必要なフィールドを生成
+    String id = java.util.UUID.randomUUID().toString(); // 一意のIDを生成
+    String createdById = "ce3b1d98-2ed8-4a02-a5c3-9e8f9e5c20f7"; // 実際のユーザーIDを設定
+    String updatedById = createdById;
+    String createdByName = "CreatedUser"; // 実際のユーザー名
+    String updatedByName = createdByName;
+    Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
-    commonTable.addRow(rowData);
+    try {
+      if (!todoQuery.isTitleDuplicated(title)) {
+        todoQuery.insertTodoItem(id, createdById, createdByName, updatedById, updatedByName, currentTimestamp,
+            currentTimestamp, title, description, isCompleted);
+
+        // データを取得してテーブルに追加
+        ResultSet resultSet = todoQuery.getTodoItemById(id);
+
+        if (resultSet.next()) {
+          addRowToTable(resultSet);
+        }
+
+        // リソース解放
+        resultSet.close();
+      } else {
+        System.out.println("Title already exists, no insertion.");
+      }
+    } catch (SQLException ex) {
+      ex.printStackTrace();
+    }
 
     // テキストフィールドをクリア
     commonTab.setFieldValue("title", "");
     commonTab.setFieldValue("description", "");
     commonTab.setFieldValue("isCompleted", false);
-
   }
+
 }
