@@ -6,6 +6,7 @@ import javax.swing.JTabbedPane;
 import java.util.Arrays;
 import java.util.Locale;
 
+import src.dataBase.PostgreSQLConnection;
 import src.tab.CommonTab;
 import src.views.SearchTodoPannel;
 import src.views.TodoListPannel;
@@ -24,10 +25,12 @@ public class TodoApp {
 
     JTabbedPane tabbedPane = new JTabbedPane();
 
-    TodoListPannel todoListPannel = new TodoListPannel();
+    PostgreSQLConnection connection = new PostgreSQLConnection();
+
+    TodoListPannel todoListPannel = new TodoListPannel(connection);
     todoListPannel.GenerateTodoListTab(tabbedPane);
 
-    SearchTodoPannel searchTodoPannel = new SearchTodoPannel();
+    SearchTodoPannel searchTodoPannel = new SearchTodoPannel(connection);
     searchTodoPannel.GenerateSearchTodoTab(tabbedPane);
 
     frame.add(tabbedPane);
