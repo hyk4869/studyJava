@@ -99,7 +99,7 @@ public class CommonTab {
     if (field instanceof JTextField) {
       return ((JTextField) field).getText();
     } else if (field instanceof CustomCheckBox) {
-      return ((CustomCheckBox) field).isChecked(); // Boolean 値を返す
+      return ((CustomCheckBox) field).isChecked();
     }
 
     return null;
