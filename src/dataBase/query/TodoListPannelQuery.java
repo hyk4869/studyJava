@@ -49,13 +49,14 @@ public class TodoListPannelQuery {
 
   /** Todo項目を取得するクエリ */
   public ResultSet getTodoItemById(String id) throws SQLException {
-    String query = "SELECT " + getAllColumns() + " FROM \"T_TodoList\" WHERE id = ?";
+    String query = "SELECT " + getAllColumns() + " FROM \"T_TodoList\" WHERE id = ? AND \"deletedAt\" IS NULL";
     return connection.executeQuery(query, id);
   }
 
   /** T_TodoListの全データを取得するクエリ */
   public ResultSet getAllTodoItems() throws SQLException {
-    String query = "SELECT " + getAllColumns() + " FROM \"T_TodoList\"";
+    String query = "SELECT " + getAllColumns() + " FROM \"T_TodoList\" WHERE \"deletedAt\" IS NULL";
     return connection.executeQuery(query);
   }
+
 }
