@@ -138,16 +138,14 @@ public class TodoListPannel implements ActionListener {
             currentTimestamp, title, description, isCompleted);
 
         // データを取得してテーブルに追加
-        ResultSet resultSet = todoQuery.getTodoItemById(id);
-
-        if (resultSet.next()) {
-          addRowToTable(resultSet);
+        try (ResultSet resultSet = todoQuery.getTodoItemById(id)) {
+          if (resultSet.next()) {
+            addRowToTable(resultSet);
+          }
         }
 
         connection.commit();
 
-        // リソース解放
-        resultSet.close();
       } else {
         System.out.println("Title already exists, no insertion.");
         connection.rollback();
