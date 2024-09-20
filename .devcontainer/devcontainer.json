@@ -55,15 +55,11 @@
     }
   },
   "portsAttributes": {
-    "backend:3500": {
-      "label": "Backend",
-      "onAutoForward": "ignore"
-    },
     "adminer:4125": {
       "label": "Adminer",
       "onAutoForward": "ignore"
     }
   },
-  "forwardPorts": [3500, "adminer:4125"],
+  "forwardPorts": ["adminer:4125"],
   "mounts": ["source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"]
 }
