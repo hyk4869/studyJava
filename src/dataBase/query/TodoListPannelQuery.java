@@ -47,6 +47,20 @@ public class TodoListPannelQuery {
         createdAt, updatedAt, isCompleted, 0);
   }
 
+  /** Todo項目を更新するクエリ */
+  /** Todo項目を更新するクエリ */
+  public void updateTodoItem(String id, String title, String description, Boolean isCompleted, Integer sort)
+      throws SQLException {
+    String query = "UPDATE \"T_TodoList\" " +
+        "SET \"title\" = ?, \"description\" = ?, \"isCompleted\" = ?, \"sort\" = ?, \"updatedAt\" = ? " +
+        "WHERE \"id\" = ? AND \"deletedAt\" IS NULL";
+
+    Timestamp updatedAt = new Timestamp(System.currentTimeMillis());
+
+    connection.executeUpdate(query, title, description, isCompleted, sort, updatedAt, id);
+
+  }
+
   /** Todo項目を取得するクエリ */
   public ResultSet getTodoItemById(String id) throws SQLException {
     String query = "SELECT " + getAllColumns() + " FROM \"T_TodoList\" WHERE id = ? AND \"deletedAt\" IS NULL";

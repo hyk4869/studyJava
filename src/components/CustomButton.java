@@ -8,25 +8,27 @@ import javax.swing.JPanel;
 
 public class CustomButton {
 
+  private JButton button;
+
   /**
    * ボタンを追加
    *
    * @param innerPanel
    * @param buttonText
    * @param gridX
-   *          配置する列
+   *                   配置する列
    * @param gridY
-   *          配置する行
+   *                   配置する行
    * @param gridWidth
-   *          列幅を設定
+   *                   列幅を設定
    * @param listener
-   *          ボタンのクリック時に実行するアクションリスナー
+   *                   ボタンのクリック時に実行するアクションリスナー
    *
    */
   public void addButton(JPanel innerPanel, String buttonText, int gridX, int gridY, int gridWidth,
       ActionListener listener) {
     GridBagConstraints innerGbc = new GridBagConstraints();
-    JButton button = new JButton(buttonText);
+    button = new JButton(buttonText);
 
     button.addActionListener(listener);
 
@@ -36,5 +38,20 @@ public class CustomButton {
     innerGbc.fill = GridBagConstraints.NONE; // ボタンの横幅を自動調整
     innerGbc.anchor = GridBagConstraints.EAST; // 右寄せ
     innerPanel.add(button, innerGbc);
+  }
+
+  public JButton getButton() {
+    return button;
+  }
+
+  /**
+   * ボタンのテキストを変更
+   *
+   * @param text ボタンに設定する新しいテキスト
+   */
+  public void setText(String text) {
+    if (button != null) {
+      button.setText(text);
+    }
   }
 }
