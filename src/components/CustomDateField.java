@@ -68,6 +68,7 @@ public class CustomDateField extends CustomStyledContents {
 
   /** 日付ピッカーの表示 */
   private void showDatePickerDialog() {
+
     // 日付ピッカーを作成
     SqlDateModel model = new SqlDateModel();
     Properties p = new Properties();
@@ -81,17 +82,14 @@ public class CustomDateField extends CustomStyledContents {
 
     // JDatePickerImplのテキストフィールドを非表示にする
     JFormattedTextField textField = datePicker.getJFormattedTextField();
-    textField.setVisible(false); // テキストフィールドを非表示
-
-    datePanel.setBackground(Color.LIGHT_GRAY); // Change to desired color
-    datePanel.setForeground(Color.BLACK);
+    textField.setVisible(false);
 
     // カスタムダイアログで日付ピッカーを表示
-    JDialog dialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(this), "日付を選択", true);
+    JDialog dialog = new JDialog((JFrame) SwingUtilities.getWindowAncestor(this), "select date", true);
     dialog.setLayout(new BorderLayout());
     dialog.add(datePanel, BorderLayout.CENTER);
     dialog.pack();
-    dialog.setLocationRelativeTo(this); // ダイアログをテキストフィールドの近くに表示
+    dialog.setLocationRelativeTo(this);
 
     // 日付選択時にCustomStyledContentsのテキストフィールドに反映し、ダイアログを閉じる
     datePanel.addActionListener(e -> {
