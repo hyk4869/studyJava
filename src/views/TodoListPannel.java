@@ -30,10 +30,12 @@ public class TodoListPannel implements ActionListener {
 
   private CommonTable commonTable;
   private CommonTab commonTab = new CommonTab();
+  private PostgreSQLConnection connection;
   private TodoListPannelQuery todoQuery;
 
   public TodoListPannel(PostgreSQLConnection connection) {
     this.todoQuery = new TodoListPannelQuery(connection);
+    this.connection = connection;
   }
 
   /** mainメソッドにTodoListタブとその中身を生成 */
@@ -142,12 +144,20 @@ public class TodoListPannel implements ActionListener {
           addRowToTable(resultSet);
         }
 
+        connection.commit();
+
         // リソース解放
         resultSet.close();
       } else {
         System.out.println("Title already exists, no insertion.");
+        connection.rollback();
       }
     } catch (SQLException ex) {
+      try {
+        connection.rollback();
+      } catch (SQLException rollbackEx) {
+        rollbackEx.printStackTrace();
+      }
       ex.printStackTrace();
     }
 

@@ -16,6 +16,7 @@ public class PostgreSQLConnection {
 
     try {
       connection = DriverManager.getConnection(url, user, password);
+      connection.setAutoCommit(false); // トランザクションを開始
       System.out.println("Connection established successfully.");
     } catch (SQLException e) {
       e.printStackTrace();
@@ -34,7 +35,6 @@ public class PostgreSQLConnection {
     PreparedStatement preparedStatement = connection.prepareStatement(query);
     setParameters(preparedStatement, params);
     int result = preparedStatement.executeUpdate();
-    System.out.println("Update successful. Rows affected: " + result);
     return result;
   }
 
@@ -43,6 +43,16 @@ public class PostgreSQLConnection {
     for (int i = 0; i < params.length; i++) {
       preparedStatement.setObject(i + 1, params[i]); // インデックスは1から始まる
     }
+  }
+
+  /** トランザクションのコミット */
+  public void commit() throws SQLException {
+    connection.commit();
+  }
+
+  /** トランザクションのロールバック */
+  public void rollback() throws SQLException {
+    connection.rollback();
   }
 
   /** 接続を閉じるメソッド */
