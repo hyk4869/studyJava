@@ -28,9 +28,9 @@ public class TodoListPannelQuery {
   }
 
   /** タイトルの重複をチェックするクエリ */
-  public boolean isTitleDuplicated(String title) throws SQLException {
-    String query = "SELECT 1 FROM \"T_TodoList\" WHERE \"title\" = ?";
-    ResultSet resultSet = connection.executeQuery(query, title);
+  public boolean isTitleDuplicated(String title, String id) throws SQLException {
+    String query = "SELECT 1 FROM \"T_TodoList\" WHERE \"title\" = ? AND \"id\" != ?";
+    ResultSet resultSet = connection.executeQuery(query, title, id);
     boolean isDuplicated = resultSet.next();
     resultSet.close();
     return isDuplicated;

@@ -179,6 +179,10 @@ public class TodoListPannel implements ActionListener {
   }
 
   private void saveModifiedRows() {
+    if (commonTable.getTable().getCellEditor() != null) {
+      commonTable.getTable().getCellEditor().stopCellEditing();
+    }
+
     try {
       for (Integer rowIndex : modifiedRows) {
         String id = (String) commonTable.getTable().getValueAt(rowIndex, 0);
@@ -188,7 +192,7 @@ public class TodoListPannel implements ActionListener {
         Integer sort = (Integer) commonTable.getTable().getValueAt(rowIndex, 8);
 
         // タイトルの重複チェック
-        if (todoQuery.isTitleDuplicated(title)) {
+        if (todoQuery.isTitleDuplicated(title, id)) {
           throw new SQLException("Error: Title '" + title + "' is duplicated. Row " + rowIndex + " cannot be saved.");
         }
 
@@ -229,7 +233,7 @@ public class TodoListPannel implements ActionListener {
 
     try {
       // タイトルの重複チェック
-      if (todoQuery.isTitleDuplicated(title)) {
+      if (todoQuery.isTitleDuplicated(title, id)) {
         throw new SQLException("Error: Title '" + title + "' is duplicated. Insertion aborted.");
       }
 
