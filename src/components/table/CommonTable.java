@@ -7,8 +7,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
@@ -46,34 +44,6 @@ public class CommonTable {
       }
     };
   }
-
-  // /** テーブルの編集状態を切り替える */
-  // public void setEditable(boolean isEditable) {
-  // this.isEditable = isEditable;
-
-  // // 現在のデータを保存
-  // ArrayList<Object[]> currentData = new ArrayList<>();
-  // for (int i = 0; i < tableModel.getRowCount(); i++) {
-  // Object[] rowData = new Object[tableModel.getColumnCount()];
-  // for (int j = 0; j < tableModel.getColumnCount(); j++) {
-  // rowData[j] = tableModel.getValueAt(i, j);
-  // }
-  // currentData.add(rowData);
-  // }
-
-  // // モデルを再作成し、編集状態を反映
-  // createTableModel();
-  // table.setModel(tableModel);
-
-  // // 保存したデータを新しいモデルに再追加
-  // for (Object[] rowData : currentData) {
-  // tableModel.addRow(rowData);
-  // }
-
-  // // テーブルの再描画
-  // table.revalidate();
-  // table.repaint();
-  // }
 
   /** テーブルの編集状態を切り替える */
   public void setEditable(boolean isEditable) {
