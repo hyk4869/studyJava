@@ -48,7 +48,6 @@ public class TodoListPannelQuery {
   }
 
   /** Todo項目を更新するクエリ */
-  /** Todo項目を更新するクエリ */
   public void updateTodoItem(String id, String title, String description, Boolean isCompleted, Integer sort)
       throws SQLException {
     String query = "UPDATE \"T_TodoList\" " +
@@ -71,6 +70,16 @@ public class TodoListPannelQuery {
   public ResultSet getAllTodoItems() throws SQLException {
     String query = "SELECT " + getAllColumns() + " FROM \"T_TodoList\" WHERE \"deletedAt\" IS NULL";
     return connection.executeQuery(query);
+  }
+
+  /**
+   * Todo項目を削除するクエリ
+   * 
+   * @param ids 削除したいTodo項目のIDリスト
+   */
+  public void deleteTodoItemsByIds(String[] ids) throws SQLException {
+    String query = "UPDATE \"T_TodoList\" SET \"deletedAt\" = NOW() WHERE \"id\" = ANY (?)";
+    connection.executeUpdate(query, (Object) ids);
   }
 
 }

@@ -22,6 +22,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import src.components.CustomButton;
@@ -125,6 +126,15 @@ public class TodoListPannel implements ActionListener {
       }
     });
 
+    CustomButton deleteButton = new CustomButton();
+    deleteButton.setVisible(false);
+    deleteButton.addButton(buttonPanel, "Delete", gbc.gridx, gbc.gridy, gbc.gridwidth, new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        deleteSelectedRows();
+      }
+    });
+
     CustomButton editButton = new CustomButton();
     editButton.addButton(buttonPanel, "Edit", gbc.gridx, gbc.gridy, gbc.gridwidth, new ActionListener() {
       @Override
@@ -133,6 +143,7 @@ public class TodoListPannel implements ActionListener {
         commonTable.setEditable(isEditable);
         editButton.setText(isEditable ? "Cancel" : "Edit");
         saveButton.setVisible(isEditable);
+        deleteButton.setVisible(isEditable);
         reloadButton.setEnabled(!isEditable);
         configureIsCompletedColumn(commonTable.getTable());
 
@@ -143,6 +154,7 @@ public class TodoListPannel implements ActionListener {
 
     buttonPanel.add(saveButton);
     buttonPanel.add(editButton);
+    buttonPanel.add(deleteButton);
     buttonPanel.add(reloadButton);
 
     tablePanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -161,8 +173,12 @@ public class TodoListPannel implements ActionListener {
   /** ResultSetから1行分のデータを取得 */
   private ArrayList<Object> getRowData(ResultSet resultSet) throws SQLException {
     ArrayList<Object> rowData = new ArrayList<>();
-    for (int i = 0; i < commonTable.getTableModel().getColumnCount(); i++) {
-      rowData.add(resultSet.getObject(commonTable.getTableModel().getColumnName(i)));
+    int columnCount = commonTable.getTableModel().getColumnCount();
+
+    // 最後の列 "Select" を無視するため、columnCount - 1 にする
+    for (int i = 0; i < columnCount - 1; i++) {
+      String columnName = commonTable.getTableModel().getColumnName(i);
+      rowData.add(resultSet.getObject(columnName)); // ResultSet から列データを取得
     }
     return rowData;
   }
@@ -190,6 +206,46 @@ public class TodoListPannel implements ActionListener {
   /** テーブルに行を追加 */
   private void addRowToTable(ArrayList<Object> rowData) {
     commonTable.addRow(rowData);
+  }
+
+  /** 選択された行を削除 */
+  private void deleteSelectedRows() {
+    if (commonTable.getTable().getCellEditor() != null) {
+      commonTable.getTable().getCellEditor().stopCellEditing();
+    }
+
+    DefaultTableModel model = commonTable.getTableModel();
+    JTable table = commonTable.getTable();
+    ArrayList<String> idsToDelete = new ArrayList<>();
+
+    for (int i = table.getRowCount() - 1; i >= 0; i--) {
+      Object value = table.getValueAt(i, table.getColumnCount() - 1);
+      if (value instanceof Boolean && (Boolean) value) {
+        String id = (String) table.getValueAt(i, 0);
+        idsToDelete.add(id);
+        model.removeRow(i);
+      }
+    }
+
+    if (!idsToDelete.isEmpty()) {
+      try {
+        todoQuery.deleteTodoItemsByIds(idsToDelete.toArray(new String[0]));
+
+        commonTable.clearTable();
+        loadAllTodoItems();
+
+        connection.commit();
+        System.out.println("Selected rows deleted successfully.");
+      } catch (SQLException ex) {
+        try {
+          connection.rollback();
+        } catch (SQLException rollbackEx) {
+          rollbackEx.printStackTrace();
+        }
+        ex.printStackTrace();
+      }
+    }
+
   }
 
   private void saveModifiedRows() {
