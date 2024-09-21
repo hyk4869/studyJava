@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -39,7 +38,6 @@ public class TodoListPannel implements ActionListener {
   /** テーブルの編集 */
   private boolean isEditable = false;
   private HashSet<Integer> modifiedRows = new HashSet<>();
-  private JButton saveButton = new JButton("Save");
 
   private TableModelListener tableModelListener = new TableModelListener() {
     @Override
@@ -54,13 +52,6 @@ public class TodoListPannel implements ActionListener {
   public TodoListPannel(PostgreSQLConnection connection) {
     this.todoQuery = new TodoListPannelQuery(connection);
     this.connection = connection;
-    saveButton.setVisible(false); // デフォルトで非表示
-    saveButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        saveModifiedRows();
-      }
-    });
   }
 
   /** isCompletedカラムの設定を行う */
@@ -112,22 +103,35 @@ public class TodoListPannel implements ActionListener {
 
     JPanel buttonPanel = new JPanel();
 
+    CustomButton saveButton = new CustomButton();
+    saveButton.setVisible(false);
+    saveButton.addButton(buttonPanel, "Save", gbc.gridx, gbc.gridy, gbc.gridwidth, new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        saveModifiedRows();
+      }
+    });
+
     CustomButton editButton = new CustomButton();
     editButton.addButton(buttonPanel, "Edit", gbc.gridx, gbc.gridy, gbc.gridwidth, new ActionListener() {
+
       @Override
       public void actionPerformed(ActionEvent e) {
         isEditable = !isEditable;
         commonTable.setEditable(isEditable);
-        editButton.setText(isEditable ? "Disable" : "Enable");
+        editButton.setText(isEditable ? "Disable" : "Edit");
         saveButton.setVisible(isEditable);
         configureIsCompletedColumn(commonTable.getTable());
 
         commonTable.getTableModel().removeTableModelListener(tableModelListener);
         commonTable.getTableModel().addTableModelListener(tableModelListener);
       }
+
     });
 
     buttonPanel.add(saveButton);
+    buttonPanel.add(editButton);
+
     tablePanel.add(buttonPanel, BorderLayout.SOUTH);
 
     // メインパネルにフォームとテーブルを追加

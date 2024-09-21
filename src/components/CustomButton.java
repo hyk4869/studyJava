@@ -6,9 +6,9 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-public class CustomButton {
+public class CustomButton extends JButton {
 
-  private JButton button;
+  // private JButton button;
 
   /**
    * ボタンを追加
@@ -27,31 +27,25 @@ public class CustomButton {
    */
   public void addButton(JPanel innerPanel, String buttonText, int gridX, int gridY, int gridWidth,
       ActionListener listener) {
-    GridBagConstraints innerGbc = new GridBagConstraints();
-    button = new JButton(buttonText);
 
-    button.addActionListener(listener);
+    this.setText(buttonText);
+    this.addActionListener(listener);
+
+    GridBagConstraints innerGbc = new GridBagConstraints();
+
+    // button = new JButton(buttonText);
+    // button.addActionListener(listener);
 
     innerGbc.gridx = gridX; // 配置する列
     innerGbc.gridy = gridY; // 配置する行
     innerGbc.gridwidth = gridWidth; // 列幅を設定
     innerGbc.fill = GridBagConstraints.NONE; // ボタンの横幅を自動調整
     innerGbc.anchor = GridBagConstraints.EAST; // 右寄せ
-    innerPanel.add(button, innerGbc);
+    innerPanel.add(this, innerGbc);
   }
 
   public JButton getButton() {
-    return button;
+    return this;
   }
 
-  /**
-   * ボタンのテキストを変更
-   *
-   * @param text ボタンに設定する新しいテキスト
-   */
-  public void setText(String text) {
-    if (button != null) {
-      button.setText(text);
-    }
-  }
 }
