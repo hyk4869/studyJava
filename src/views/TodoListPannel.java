@@ -25,8 +25,8 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-import src.components.CustomButton;
 import src.components.enums.TextFieldStyle;
+import src.components.parts.CustomButton;
 import src.components.table.CommonTable;
 import src.components.table.override.checkbox.CheckBoxEditor;
 import src.components.table.override.checkbox.CheckBoxRenderer;

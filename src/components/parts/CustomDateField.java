@@ -1,4 +1,4 @@
-package src.components;
+package src.components.parts;
 
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;

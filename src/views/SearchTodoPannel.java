@@ -8,8 +8,8 @@ import java.util.Map;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-import src.components.CustomButton;
 import src.components.enums.TextFieldStyle;
+import src.components.parts.CustomButton;
 import src.dataBase.PostgreSQLConnection;
 import src.tab.CommonTab;
 

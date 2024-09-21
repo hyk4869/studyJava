@@ -1,4 +1,4 @@
-package src.components;
+package src.components.parts;
 
 import javax.swing.JCheckBox;
 

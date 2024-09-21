@@ -17,12 +17,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import src.components.CustomCheckBox;
-import src.components.CustomDateField;
-import src.components.CustomNumericField;
-import src.components.CustomTextField;
 import src.components.enums.TextFieldStyle;
 import src.components.labels.CustomLabeledComponent;
+import src.components.parts.CustomCheckBox;
+import src.components.parts.CustomDateField;
+import src.components.parts.CustomNumericField;
+import src.components.parts.CustomTextField;
 import src.tab.pannels.CreatePannel;
 import src.utils.CommonFont;
 

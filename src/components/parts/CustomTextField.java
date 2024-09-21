@@ -1,4 +1,4 @@
-package src.components;
+package src.components.parts;
 
 import src.components.enums.TextFieldStyle;
 import src.components.styles.CustomStyledContents;
