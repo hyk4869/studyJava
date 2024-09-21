@@ -6,6 +6,7 @@ import javax.swing.JTextField;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
+import javax.swing.plaf.InsetsUIResource;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -36,7 +37,7 @@ public class CommonTab {
   /** 初期化 */
   public static void initializeUI() {
     // タブの高さを変更
-    UIManager.put("TabbedPane.tabInsets", new javax.swing.plaf.InsetsUIResource(10, 20, 10, 20));
+    UIManager.put("TabbedPane.tabInsets", new InsetsUIResource(10, 20, 10, 20));
     // フォントの設定
     UIManager.put("TabbedPane.font", new FontUIResource(commonFont.commonNotoSansCJKJP(14)));
   }

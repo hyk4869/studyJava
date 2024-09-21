@@ -1,11 +1,13 @@
 package src.components.table;
 
+import java.awt.BorderLayout;
 import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.border.TitledBorder;
 import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 /** 共通のテーブルを生成 */
 public class CommonTable {
@@ -20,8 +22,11 @@ public class CommonTable {
     this.isEditable = isEditable;
     createTableModel();
     table = new JTable(tableModel);
-    table.setRowHeight(30);
 
+    TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(tableModel);
+    table.setRowSorter(sorter);
+
+    table.setRowHeight(30);
   }
 
   /** テーブルモデルを作成 */
@@ -64,11 +69,11 @@ public class CommonTable {
 
   /** テーブルパネルの作成 */
   public JPanel createTablePanel(String panelTitle) {
-    JPanel tablePanel = new JPanel(new java.awt.BorderLayout());
+    JPanel tablePanel = new JPanel(new BorderLayout());
     tablePanel.setBorder(new TitledBorder(panelTitle));
 
     JScrollPane scrollPane = new JScrollPane(table);
-    tablePanel.add(scrollPane, java.awt.BorderLayout.CENTER);
+    tablePanel.add(scrollPane, BorderLayout.CENTER);
     return tablePanel;
   }
 

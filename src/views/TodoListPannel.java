@@ -2,6 +2,8 @@ package src.views;
 
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.ResultSet;
@@ -11,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.Comparator;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -80,7 +84,7 @@ public class TodoListPannel implements ActionListener {
     // innerPanelの作成
     JPanel innerPanel = commonTab.createInnerPanel("Add Your Todo", fieldConfigs, TextFieldStyle.STANDARD, 1);
     // formPanelの作成
-    JPanel formPanel = new JPanel(new java.awt.GridBagLayout());
+    JPanel formPanel = new JPanel(new GridBagLayout());
 
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.gridx = 0;
@@ -88,7 +92,7 @@ public class TodoListPannel implements ActionListener {
     gbc.gridwidth = 2;
     gbc.fill = GridBagConstraints.HORIZONTAL;
     gbc.weightx = 1.0;
-    gbc.insets = new java.awt.Insets(10, 0, 0, 0);
+    gbc.insets = new Insets(10, 0, 0, 0);
 
     formPanel.add(innerPanel, gbc);
 
@@ -112,25 +116,34 @@ public class TodoListPannel implements ActionListener {
       }
     });
 
+    CustomButton reloadButton = new CustomButton();
+    reloadButton.addButton(buttonPanel, "Reload", gbc.gridx, gbc.gridy, gbc.gridwidth, new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        commonTable.clearTable();
+        loadAllTodoItems();
+      }
+    });
+
     CustomButton editButton = new CustomButton();
     editButton.addButton(buttonPanel, "Edit", gbc.gridx, gbc.gridy, gbc.gridwidth, new ActionListener() {
-
       @Override
       public void actionPerformed(ActionEvent e) {
         isEditable = !isEditable;
         commonTable.setEditable(isEditable);
-        editButton.setText(isEditable ? "Disable" : "Edit");
+        editButton.setText(isEditable ? "Cancel" : "Edit");
         saveButton.setVisible(isEditable);
+        reloadButton.setEnabled(!isEditable);
         configureIsCompletedColumn(commonTable.getTable());
 
         commonTable.getTableModel().removeTableModelListener(tableModelListener);
         commonTable.getTableModel().addTableModelListener(tableModelListener);
       }
-
     });
 
     buttonPanel.add(saveButton);
     buttonPanel.add(editButton);
+    buttonPanel.add(reloadButton);
 
     tablePanel.add(buttonPanel, BorderLayout.SOUTH);
 
@@ -145,36 +158,37 @@ public class TodoListPannel implements ActionListener {
     loadAllTodoItems();
   }
 
+  /** ResultSetから1行分のデータを取得 */
+  private ArrayList<Object> getRowData(ResultSet resultSet) throws SQLException {
+    ArrayList<Object> rowData = new ArrayList<>();
+    for (int i = 0; i < commonTable.getTableModel().getColumnCount(); i++) {
+      rowData.add(resultSet.getObject(commonTable.getTableModel().getColumnName(i)));
+    }
+    return rowData;
+  }
+
   /** T_TodoListの全データをロードしてテーブルに追加 */
   private void loadAllTodoItems() {
-    try {
-      ResultSet resultSet = todoQuery.getAllTodoItems();
+    try (ResultSet resultSet = todoQuery.getAllTodoItems()) {
+      List<ArrayList<Object>> rows = new ArrayList<>();
 
       while (resultSet.next()) {
-        addRowToTable(resultSet);
+        rows.add(getRowData(resultSet)); // データをリストに追加
       }
 
-      // リソース解放
-      resultSet.close();
+      // updatedAtで降順にソートし、テーブルに追加
+      rows.stream()
+          .sorted(Comparator.comparing(row -> (Timestamp) row.get(commonTable.getTableModel().findColumn("updatedAt")),
+              Comparator.reverseOrder()))
+          .forEach(d -> addRowToTable(d));
+
     } catch (SQLException ex) {
       ex.printStackTrace();
     }
   }
 
-  /** ResultSetからデータを取得してテーブルに行を追加 */
-  private void addRowToTable(ResultSet resultSet) throws SQLException {
-    ArrayList<Object> rowData = new ArrayList<>();
-    rowData.add(resultSet.getString("id"));
-    rowData.add(resultSet.getString("title"));
-    rowData.add(resultSet.getString("description"));
-    rowData.add(resultSet.getString("createdByName"));
-    rowData.add(resultSet.getString("updatedByName"));
-    rowData.add(resultSet.getTimestamp("createdAt"));
-    rowData.add(resultSet.getTimestamp("updatedAt"));
-    rowData.add(resultSet.getBoolean("isCompleted"));
-    rowData.add(resultSet.getInt("sort"));
-
-    // テーブルに追加
+  /** テーブルに行を追加 */
+  private void addRowToTable(ArrayList<Object> rowData) {
     commonTable.addRow(rowData);
   }
 
