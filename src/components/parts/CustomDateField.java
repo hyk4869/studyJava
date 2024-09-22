@@ -18,10 +18,10 @@ import java.util.Properties;
 import java.util.Locale;
 
 import src.components.enums.TextFieldStyle;
-import src.components.styles.CustomStyledContents;
+import src.components.styles.CustomStyledTextFields;
 
 /** 日付のinput */
-public class CustomDateField extends CustomStyledContents {
+public class CustomDateField extends CustomStyledTextFields {
 
   // フィールド
   private JButton customEllipsisButton;

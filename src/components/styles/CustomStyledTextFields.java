@@ -16,7 +16,7 @@ import src.utils.CommonColor;
 import src.utils.CommonFont;
 import src.utils.CommonPadding;
 
-public abstract class CustomStyledContents extends JFormattedTextField {
+public abstract class CustomStyledTextFields extends JFormattedTextField {
 
   /** OUTLINEDのスタイル保持 */
   private final Border outlinedBorder;
@@ -38,7 +38,7 @@ public abstract class CustomStyledContents extends JFormattedTextField {
   protected final CommonFont commonFont = new CommonFont();
 
   // コンストラクタ
-  public CustomStyledContents(TextFieldStyle style, int fontSize) {
+  public CustomStyledTextFields(TextFieldStyle style, int fontSize) {
     this.style = style;
 
     // ボーダーの初期化

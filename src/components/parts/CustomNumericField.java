@@ -4,12 +4,12 @@ import javax.swing.text.NumberFormatter;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import src.components.enums.TextFieldStyle;
-import src.components.styles.CustomStyledContents;
+import src.components.styles.CustomStyledTextFields;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
 /** 数字のinput */
-public class CustomNumericField extends CustomStyledContents {
+public class CustomNumericField extends CustomStyledTextFields {
 
   // コンストラクタ
   public CustomNumericField(int columns, TextFieldStyle style, int fontSize) {

@@ -1,10 +1,10 @@
 package src.components.parts;
 
 import src.components.enums.TextFieldStyle;
-import src.components.styles.CustomStyledContents;
+import src.components.styles.CustomStyledTextFields;
 
 /** 文字のinput */
-public class CustomTextField extends CustomStyledContents {
+public class CustomTextField extends CustomStyledTextFields {
 
   // コンストラクタ
   public CustomTextField(int columns, TextFieldStyle style, int fontSize) {
