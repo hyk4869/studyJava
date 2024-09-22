@@ -33,9 +33,6 @@ public final class CustomButton extends JButton {
 
     GridBagConstraints innerGbc = new GridBagConstraints();
 
-    // button = new JButton(buttonText);
-    // button.addActionListener(listener);
-
     innerGbc.gridx = gridX; // 配置する列
     innerGbc.gridy = gridY; // 配置する行
     innerGbc.gridwidth = gridWidth; // 列幅を設定

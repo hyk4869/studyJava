@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+/** ラジオボタン */
 public final class CustomRadioButton extends JPanel {
 
   private List<JRadioButton> buttons;

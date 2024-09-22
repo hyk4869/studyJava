@@ -11,7 +11,6 @@ import java.text.ParseException;
 /** 数字のinput */
 public final class CustomNumericField extends CustomStyledTextFields {
 
-  // コンストラクタ
   public CustomNumericField(int columns, TextFieldStyle style, int fontSize) {
     super(style, fontSize);
     setFormatter(createFormatter());
@@ -29,8 +28,8 @@ public final class CustomNumericField extends CustomStyledTextFields {
     });
   }
 
-  // 数値フォーマッターを作成
-  private static NumberFormatter createFormatter() {
+  /** 数値フォーマッターを作成 */
+  private NumberFormatter createFormatter() {
     NumberFormat format = NumberFormat.getIntegerInstance();
     format.setGroupingUsed(false);
     NumberFormatter formatter = new NumberFormatter(format) {

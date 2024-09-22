@@ -23,10 +23,8 @@ import src.components.styles.CustomStyledTextFields;
 /** 日付のinput */
 public final class CustomDateField extends CustomStyledTextFields {
 
-  // フィールド
   private JButton customEllipsisButton;
 
-  /** コンストラクタ */
   public CustomDateField(int columns, TextFieldStyle style, int fontSize) {
     super(style, fontSize);
     setFormatter(createFormatter());
@@ -113,7 +111,7 @@ public final class CustomDateField extends CustomStyledTextFields {
   }
 
   /** 日付フォーマッターを作成 */
-  private static DateFormatter createFormatter() {
+  private DateFormatter createFormatter() {
     DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     DateFormatter formatter = new DateFormatter(format) {
       @Override

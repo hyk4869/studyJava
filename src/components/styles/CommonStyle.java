@@ -16,6 +16,7 @@ import src.utils.CommonColor;
 import src.utils.CommonFont;
 import src.utils.CommonPadding;
 
+/** 共通のスタイルを記述 */
 public class CommonStyle<T extends JComponent> {
 
   /** OUTLINEDのスタイル保持 */

@@ -46,7 +46,7 @@ public class CommonTab {
     UIManager.put("TabbedPane.font", new FontUIResource(commonFont.commonNotoSansCJKJP(14)));
   }
 
-  /** テキストフィールドの追加 */
+  /** 指定した各テキストフィールドの追加 */
   private void addFields(JPanel innerPanel, Map<String, String> fieldConfigs, TextFieldStyle style, int columns) {
     GridBagConstraints innerGbc = new GridBagConstraints();
     innerGbc.insets = new Insets(10, 10, 10, 10);
