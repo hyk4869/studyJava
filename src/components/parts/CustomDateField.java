@@ -21,7 +21,7 @@ import src.components.enums.TextFieldStyle;
 import src.components.styles.CustomStyledTextFields;
 
 /** 日付のinput */
-public class CustomDateField extends CustomStyledTextFields {
+public final class CustomDateField extends CustomStyledTextFields {
 
   // フィールド
   private JButton customEllipsisButton;

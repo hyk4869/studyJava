@@ -2,7 +2,7 @@ package src.components.parts;
 
 import javax.swing.JCheckBox;
 
-public class CustomCheckBox extends JCheckBox {
+public final class CustomCheckBox extends JCheckBox {
 
   // コンストラクタ
   public CustomCheckBox(String label) {

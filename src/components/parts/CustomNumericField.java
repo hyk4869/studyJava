@@ -9,7 +9,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 
 /** 数字のinput */
-public class CustomNumericField extends CustomStyledTextFields {
+public final class CustomNumericField extends CustomStyledTextFields {
 
   // コンストラクタ
   public CustomNumericField(int columns, TextFieldStyle style, int fontSize) {

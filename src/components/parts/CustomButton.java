@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-public class CustomButton extends JButton {
+public final class CustomButton extends JButton {
 
   // private JButton button;
 
