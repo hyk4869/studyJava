@@ -74,7 +74,7 @@ public class TodoListPannel implements ActionListener {
   public void GenerateTodoListTab(JTabbedPane tabbedPane) {
     Map<String, String> fieldConfigs = new LinkedHashMap<>();
     fieldConfigs.put("title", "text");
-    fieldConfigs.put("description", "text");
+    fieldConfigs.put("description", "textArea");
     fieldConfigs.put("isCompleted", "check");
 
     commonTable = new CommonTable(new Object[] { "id", "title", "description", "createdByName", "updatedByName",

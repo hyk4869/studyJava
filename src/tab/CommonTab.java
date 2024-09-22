@@ -1,9 +1,12 @@
 package src.tab;
 
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.JTextArea;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.InsetsUIResource;
@@ -22,6 +25,7 @@ import src.components.labels.CustomLabeledComponent;
 import src.components.parts.CustomCheckBox;
 import src.components.parts.CustomDateField;
 import src.components.parts.CustomNumericField;
+import src.components.parts.CustomTextArea;
 import src.components.parts.CustomTextField;
 import src.tab.pannels.CreatePannel;
 import src.utils.CommonFont;
@@ -71,6 +75,22 @@ public class CommonTab {
         labeledComponent = new CustomLabeledComponent(labelText, checkBox);
         field = checkBox;
 
+      } else if ("textArea".equalsIgnoreCase(fieldType)) {
+        CustomTextArea customTextArea = new CustomTextArea(5, 20, style, 14);
+
+        customTextArea.setLineWrap(true);
+        customTextArea.setWrapStyleWord(true);
+
+        JScrollPane scrollPane = new JScrollPane(customTextArea);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+        // 固定サイズを指定せずに、行数・列数に基づく
+        customTextArea.setPreferredSize(null);
+
+        labeledComponent = new CustomLabeledComponent(labelText, scrollPane);
+        field = customTextArea;
+
       } else {
         CustomTextField textFieldStandard = new CustomTextField(20, style, 14);
         labeledComponent = new CustomLabeledComponent(labelText, textFieldStandard);
@@ -101,6 +121,8 @@ public class CommonTab {
       return ((JTextField) field).getText();
     } else if (field instanceof CustomCheckBox) {
       return ((CustomCheckBox) field).isChecked();
+    } else if (field instanceof JTextArea) {
+      return ((JTextArea) field).getText();
     }
 
     return null;
@@ -114,6 +136,8 @@ public class CommonTab {
       ((JTextField) field).setText((String) value);
     } else if (field instanceof CustomCheckBox) {
       ((CustomCheckBox) field).setChecked((Boolean) value);
+    } else if (field instanceof JTextArea) {
+      ((JTextArea) field).setText((String) value);
     }
   }
 
