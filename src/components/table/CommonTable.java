@@ -46,18 +46,18 @@ public class CommonTable extends JTable {
 
     // 現在のデータを保存
     ArrayList<Object[]> currentData = new ArrayList<>();
-    for (int i = 0; i < tableModel.getRowCount(); i++) {
-      Object[] rowData = new Object[tableModel.getColumnCount()];
-      for (int j = 0; j < tableModel.getColumnCount(); j++) {
-        rowData[j] = tableModel.getValueAt(i, j);
+    for (int i = 0; i < getTableModel().getRowCount(); i++) {
+      Object[] rowData = new Object[getTableModel().getColumnCount()];
+      for (int j = 0; j < getTableModel().getColumnCount(); j++) {
+        rowData[j] = getTableModel().getValueAt(i, j);
       }
       currentData.add(rowData);
     }
 
     // モデルを再作成して編集可否を反映
-    tableModel.setRowCount(0);
+    getTableModel().setRowCount(0);
     for (Object[] rowData : currentData) {
-      tableModel.addRow(rowData);
+      getTableModel().addRow(rowData);
     }
 
     // 編集モード時にチェックボックス列を追加
@@ -81,10 +81,10 @@ public class CommonTable extends JTable {
 
   /** チェックボックス列を追加 */
   private void addCheckBoxColumn() {
-    tableModel.addColumn("Delete");
-    this.getColumnModel().getColumn(tableModel.getColumnCount() - 1)
+    getTableModel().addColumn("Delete");
+    this.getColumnModel().getColumn(getTableModel().getColumnCount() - 1)
         .setCellRenderer(new CheckBoxRenderer());
-    this.getColumnModel().getColumn(tableModel.getColumnCount() - 1)
+    this.getColumnModel().getColumn(getTableModel().getColumnCount() - 1)
         .setCellEditor(new CheckBoxEditor(new JCheckBox()));
     checkBoxColumnAdded = true;
   }
@@ -92,19 +92,30 @@ public class CommonTable extends JTable {
   /** チェックボックス列を削除 */
   private void removeCheckBoxColumn() {
     if (checkBoxColumnAdded) {
-      this.getColumnModel().removeColumn(this.getColumnModel().getColumn(tableModel.getColumnCount() - 1));
+      // "Delete" カラムのインデックスを取得
+      int deleteColumnIndex = getColumnModel().getColumnCount() - 1;
+
+      // 表示から削除
+      getColumnModel().removeColumn(getColumnModel().getColumn(deleteColumnIndex));
+
+      // TableModelのカラム情報を直接操作
+      tableModel.setColumnCount(tableModel.getColumnCount() - 1);
+
+      this.revalidate();
+      this.repaint();
+
       checkBoxColumnAdded = false;
     }
   }
 
   /** 行を追加 */
   public void addRow(ArrayList<Object> rowData) {
-    tableModel.addRow(rowData.toArray());
+    getTableModel().addRow(rowData.toArray());
   }
 
   /** 全データをクリア */
   public void clearTable() {
-    tableModel.setRowCount(0);
+    getTableModel().setRowCount(0);
   }
 
   /** テーブルパネルの作成 */
@@ -138,28 +149,24 @@ public class CommonTable extends JTable {
   }
 
   /** 列名からインデックスを取得する */
-  private int getColumnIndexByName(String columnName) {
+  public int getColumnIndexByName(String columnName) {
     for (int i = 0; i < getColumnCount(); i++) {
       if (getColumnName(i).equals(columnName)) {
         return i;
       }
     }
-    return -1; // 列名が見つからなかった場合
+    throw new IllegalArgumentException("Invalid column name: " + columnName);
   }
 
   /** データをリロードするメソッド */
   public void reloadTableData(List<ArrayList<Object>> rows, DefaultSortDateType sortColumnName) {
     int sortColumnIndex = getColumnIndexByName(sortColumnName.name());
 
-    if (sortColumnIndex == -1) {
-      throw new IllegalArgumentException("Invalid column name: " + sortColumnName);
-    }
-
     clearTable();
 
-    // rowsをソートしてテーブルに追加
     rows.stream()
         .sorted(Comparator.comparing(row -> (Timestamp) row.get(sortColumnIndex), Comparator.reverseOrder()))
         .forEach(d -> addRow(d));
   }
+
 }
