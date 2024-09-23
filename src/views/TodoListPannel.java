@@ -131,7 +131,10 @@ public class TodoListPannel implements ActionListener {
     deleteButton.addButton(buttonPanel, "Delete", gbc.gridx, gbc.gridy, gbc.gridwidth, new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        deleteSelectedRows();
+        List<String> idsToDelete = commonTable.deleteSelectedRows();
+        if (!idsToDelete.isEmpty()) {
+          deleteFromDatabase(idsToDelete);
+        }
       }
     });
 
@@ -178,7 +181,9 @@ public class TodoListPannel implements ActionListener {
     // 最後の列 "Select" を無視するため、columnCount - 1 にする
     for (int i = 0; i < columnCount - 1; i++) {
       String columnName = commonTable.getTableModel().getColumnName(i);
-      rowData.add(resultSet.getObject(columnName)); // ResultSet から列データを取得
+      if (!columnName.equals("Delete")) { // "Delete" 列を無視
+        rowData.add(resultSet.getObject(columnName));
+      }
     }
     return rowData;
   }
@@ -208,44 +213,24 @@ public class TodoListPannel implements ActionListener {
     commonTable.addRow(rowData);
   }
 
-  /** 選択された行を削除 */
-  private void deleteSelectedRows() {
-    if (commonTable.getTable().getCellEditor() != null) {
-      commonTable.getTable().getCellEditor().stopCellEditing();
-    }
+  /** DBから削除 */
+  private void deleteFromDatabase(List<String> idsToDelete) {
+    try {
+      todoQuery.deleteTodoItemsByIds(idsToDelete.toArray(new String[0]));
 
-    DefaultTableModel model = commonTable.getTableModel();
-    JTable table = commonTable.getTable();
-    ArrayList<String> idsToDelete = new ArrayList<>();
+      commonTable.clearTable();
+      loadAllTodoItems();
 
-    for (int i = table.getRowCount() - 1; i >= 0; i--) {
-      Object value = table.getValueAt(i, table.getColumnCount() - 1);
-      if (value instanceof Boolean && (Boolean) value) {
-        String id = (String) table.getValueAt(i, 0);
-        idsToDelete.add(id);
-        model.removeRow(i);
-      }
-    }
-
-    if (!idsToDelete.isEmpty()) {
+      connection.commit();
+      System.out.println("Selected rows deleted successfully.");
+    } catch (SQLException ex) {
       try {
-        todoQuery.deleteTodoItemsByIds(idsToDelete.toArray(new String[0]));
-
-        commonTable.clearTable();
-        loadAllTodoItems();
-
-        connection.commit();
-        System.out.println("Selected rows deleted successfully.");
-      } catch (SQLException ex) {
-        try {
-          connection.rollback();
-        } catch (SQLException rollbackEx) {
-          rollbackEx.printStackTrace();
-        }
-        ex.printStackTrace();
+        connection.rollback();
+      } catch (SQLException rollbackEx) {
+        rollbackEx.printStackTrace();
       }
+      ex.printStackTrace();
     }
-
   }
 
   private void saveModifiedRows() {
@@ -254,12 +239,23 @@ public class TodoListPannel implements ActionListener {
     }
 
     try {
+      ArrayList<Integer> validModifiedRows = new ArrayList<>();
+
+      // 有効な行インデックスのみを収集
       for (Integer rowIndex : modifiedRows) {
-        String id = (String) commonTable.getTable().getValueAt(rowIndex, 0);
-        String title = (String) commonTable.getTable().getValueAt(rowIndex, 1);
-        String description = (String) commonTable.getTable().getValueAt(rowIndex, 2);
-        Boolean isCompleted = (Boolean) commonTable.getTable().getValueAt(rowIndex, 7);
-        Integer sort = (Integer) commonTable.getTable().getValueAt(rowIndex, 8);
+        if (rowIndex >= 0 && rowIndex < commonTable.getRowCount()) {
+          validModifiedRows.add(rowIndex);
+        }
+      }
+
+      for (Integer rowIndex : validModifiedRows) {
+        int modelRowIndex = commonTable.convertRowIndexToModel(rowIndex);
+
+        String id = (String) commonTable.getTableModel().getValueAt(modelRowIndex, 0);
+        String title = (String) commonTable.getTableModel().getValueAt(modelRowIndex, 1);
+        String description = (String) commonTable.getTableModel().getValueAt(modelRowIndex, 2);
+        Boolean isCompleted = (Boolean) commonTable.getTableModel().getValueAt(modelRowIndex, 7);
+        Integer sort = (Integer) commonTable.getTableModel().getValueAt(modelRowIndex, 8);
 
         // タイトルの重複チェック
         if (todoQuery.isTitleDuplicated(title, id)) {
@@ -269,10 +265,9 @@ public class TodoListPannel implements ActionListener {
         // タイトルが重複していない場合のみ更新
         todoQuery.updateTodoItem(id, title, description, isCompleted, sort);
       }
+
       commonTable.clearTable();
-
       loadAllTodoItems();
-
       connection.commit();
     } catch (SQLException ex) {
       try {
