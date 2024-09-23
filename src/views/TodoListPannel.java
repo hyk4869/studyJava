@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
-import java.util.Comparator;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -22,12 +21,13 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
+import src.components.enums.DefaultSortDateType;
 import src.components.enums.TextFieldStyle;
 import src.components.parts.CustomButton;
 import src.components.table.CommonTable;
+import src.components.table.columns.TableColumns;
 import src.components.table.override.checkbox.CheckBoxEditor;
 import src.components.table.override.checkbox.CheckBoxRenderer;
 import src.dataBase.PostgreSQLConnection;
@@ -43,6 +43,7 @@ public class TodoListPannel implements ActionListener {
   /** テーブルの編集 */
   private boolean isEditable = false;
   private HashSet<Integer> modifiedRows = new HashSet<>();
+  private TableColumns tableColumns = new TableColumns();
 
   private TableModelListener tableModelListener = new TableModelListener() {
     @Override
@@ -77,8 +78,7 @@ public class TodoListPannel implements ActionListener {
     fieldConfigs.put("description", "textArea");
     fieldConfigs.put("isCompleted", "check");
 
-    commonTable = new CommonTable(new Object[] { "id", "title", "description", "createdByName", "updatedByName",
-        "createdAt", "updatedAt", "isCompleted", "sort" }, isEditable);
+    commonTable = new CommonTable(tableColumns.TODO_LIST_COLUMNS, isEditable);
 
     commonTable.getTableModel().addTableModelListener(tableModelListener);
 
@@ -121,7 +121,6 @@ public class TodoListPannel implements ActionListener {
     reloadButton.addButton(buttonPanel, "Reload", gbc.gridx, gbc.gridy, gbc.gridwidth, new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        commonTable.clearTable();
         loadAllTodoItems();
       }
     });
@@ -197,20 +196,11 @@ public class TodoListPannel implements ActionListener {
         rows.add(getRowData(resultSet)); // データをリストに追加
       }
 
-      // updatedAtで降順にソートし、テーブルに追加
-      rows.stream()
-          .sorted(Comparator.comparing(row -> (Timestamp) row.get(commonTable.getTableModel().findColumn("updatedAt")),
-              Comparator.reverseOrder()))
-          .forEach(d -> addRowToTable(d));
+      commonTable.reloadTableData(rows, DefaultSortDateType.updatedAt);
 
     } catch (SQLException ex) {
       ex.printStackTrace();
     }
-  }
-
-  /** テーブルに行を追加 */
-  private void addRowToTable(ArrayList<Object> rowData) {
-    commonTable.addRow(rowData);
   }
 
   /** DBから削除 */
@@ -218,7 +208,6 @@ public class TodoListPannel implements ActionListener {
     try {
       todoQuery.deleteTodoItemsByIds(idsToDelete.toArray(new String[0]));
 
-      commonTable.clearTable();
       loadAllTodoItems();
 
       connection.commit();
@@ -266,7 +255,6 @@ public class TodoListPannel implements ActionListener {
         todoQuery.updateTodoItem(id, title, description, isCompleted, sort);
       }
 
-      commonTable.clearTable();
       loadAllTodoItems();
       connection.commit();
     } catch (SQLException ex) {
@@ -305,9 +293,6 @@ public class TodoListPannel implements ActionListener {
       // タイトルが重複していない場合のみ挿入
       todoQuery.insertTodoItem(id, createdById, createdByName, updatedById, updatedByName, currentTimestamp,
           currentTimestamp, title, description, isCompleted);
-
-      // テーブルをクリアして全データを再取得
-      commonTable.clearTable();
 
       loadAllTodoItems();
 

@@ -1,13 +1,17 @@
 package src.components.table;
 
 import java.awt.BorderLayout;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
+
+import src.components.enums.DefaultSortDateType;
 import src.components.table.override.checkbox.CheckBoxEditor;
 import src.components.table.override.checkbox.CheckBoxRenderer;
 
@@ -17,9 +21,9 @@ public class CommonTable extends JTable {
   private boolean isEditable;
   private boolean checkBoxColumnAdded = false;
 
-  public CommonTable(Object[] columnNames, boolean isEditable) {
-    // JTable にデフォルトのテーブルモデルをセット
-    super(new DefaultTableModel(columnNames, 0));
+  public CommonTable(List<String> columnNames, boolean isEditable) {
+    super(new DefaultTableModel(columnNames.toArray(), 0));
+
     this.tableModel = (DefaultTableModel) this.getModel();
     this.isEditable = isEditable;
     this.setRowSorter(new TableRowSorter<>(tableModel));
@@ -131,5 +135,31 @@ public class CommonTable extends JTable {
       }
     }
     return idsToDelete;
+  }
+
+  /** 列名からインデックスを取得する */
+  private int getColumnIndexByName(String columnName) {
+    for (int i = 0; i < getColumnCount(); i++) {
+      if (getColumnName(i).equals(columnName)) {
+        return i;
+      }
+    }
+    return -1; // 列名が見つからなかった場合
+  }
+
+  /** データをリロードするメソッド */
+  public void reloadTableData(List<ArrayList<Object>> rows, DefaultSortDateType sortColumnName) {
+    int sortColumnIndex = getColumnIndexByName(sortColumnName.name());
+
+    if (sortColumnIndex == -1) {
+      throw new IllegalArgumentException("Invalid column name: " + sortColumnName);
+    }
+
+    clearTable();
+
+    // rowsをソートしてテーブルに追加
+    rows.stream()
+        .sorted(Comparator.comparing(row -> (Timestamp) row.get(sortColumnIndex), Comparator.reverseOrder()))
+        .forEach(d -> addRow(d));
   }
 }
