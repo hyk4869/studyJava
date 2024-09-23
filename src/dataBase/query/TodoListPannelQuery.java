@@ -68,7 +68,7 @@ public class TodoListPannelQuery {
 
   /** T_TodoListの全データを取得するクエリ */
   public ResultSet getAllTodoItems() throws SQLException {
-    String query = "SELECT " + getAllColumns() + " FROM \"T_TodoList\" WHERE \"deletedAt\" IS NULL";
+    String query = "SELECT * FROM \"T_TodoList\" WHERE \"deletedAt\" IS NULL";
     return connection.executeQuery(query);
   }
 
