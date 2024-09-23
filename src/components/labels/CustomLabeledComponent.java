@@ -3,11 +3,11 @@ package src.components.labels;
 import javax.swing.*;
 import java.awt.*;
 
+/** 各フィールドのラベルを作っている */
 public class CustomLabeledComponent extends JPanel {
 
   private final JLabel label;
 
-  // コンストラクタ
   public CustomLabeledComponent(String labelText, JComponent component) {
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS)); // 垂直に配置
 
