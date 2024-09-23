@@ -29,7 +29,7 @@ public class TodoListPannelQuery {
 
   /** タイトルの重複をチェックするクエリ */
   public boolean isTitleDuplicated(String title, String id) throws SQLException {
-    String query = "SELECT 1 FROM \"T_TodoList\" WHERE \"title\" = ? AND \"id\" != ?";
+    String query = "SELECT 1 FROM \"T_TodoList\" WHERE \"title\" = ? AND \"id\" != ? AND \"deletedAt\" IS NULL";
     ResultSet resultSet = connection.executeQuery(query, title, id);
     boolean isDuplicated = resultSet.next();
     resultSet.close();
@@ -74,7 +74,7 @@ public class TodoListPannelQuery {
 
   /**
    * Todo項目を削除するクエリ
-   * 
+   *
    * @param ids 削除したいTodo項目のIDリスト
    */
   public void deleteTodoItemsByIds(String[] ids) throws SQLException {
