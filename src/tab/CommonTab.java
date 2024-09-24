@@ -124,7 +124,7 @@ public class CommonTab {
     }
   }
 
-  /** オーバーロードしたもの */
+  /** オーバーロードしたもの TODO:要らないからあとで削除 */
   private void addFields(JPanel innerPanel, Map<String, String> fieldConfigs,
       TextFieldStyle style, int columns) {
     GridBagConstraints innerGbc = new GridBagConstraints();

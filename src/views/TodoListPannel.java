@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -85,8 +86,10 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     JPanel innerPanel = commonTab.createInnerPanel("Add Your Todo", fieldConfigs, fieldLabel.TODO_FIELD_LABELS,
         TextFieldStyle.STANDARD, 1);
 
-    // TODO: 何を表示するのかを後で考える
-    commonTable = new CommonTable(tableColumns.TODO_LIST_COLUMNS, isEditable, tableColumns.TODO_LIST_COLUMN_LABELS);
+    List<String> newTodoListColumn = tableColumns.pickColumns(tableColumns.TODO_LIST_COLUMNS,
+        Arrays.asList("title", "description", "isCompleted", "sort", "updatedAt"));
+
+    commonTable = new CommonTable(newTodoListColumn, isEditable, tableColumns.TODO_LIST_COLUMN_LABELS);
 
     commonTable.getTableModel().addTableModelListener(tableModelListener);
 
@@ -161,14 +164,23 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
   /** overrideしたカラムの読み込み */
   private void reloadOverridedColumn(JTable table) {
     commonTable.overrideColumnLabel();
+    int isCompletedColumnIndex = commonTable.getColumnIndexByName("isCompleted");
 
-    TableColumn isCompletedColumn = table.getColumnModel().getColumn(7);
-    isCompletedColumn.setCellRenderer(new CheckBoxRenderer());
-    isCompletedColumn.setCellEditor(new CheckBoxEditor(new JCheckBox()));
+    if (isCompletedColumnIndex != -1) {
+      TableColumn isCompletedColumn = table.getColumnModel().getColumn(isCompletedColumnIndex);
 
-    commonTable.getTable().getColumnModel().getColumn(0).setMinWidth(0);
-    commonTable.getTable().getColumnModel().getColumn(0).setMaxWidth(0);
-    commonTable.getTable().getColumnModel().getColumn(0).setWidth(0);
+      isCompletedColumn.setCellRenderer(new CheckBoxRenderer());
+      isCompletedColumn.setCellEditor(new CheckBoxEditor(new JCheckBox()));
+    }
+
+    int isIdColumn = commonTable.getColumnIndexByName("id");
+
+    if (isIdColumn != -1) {
+      commonTable.getTable().getColumnModel().getColumn(0).setMinWidth(0);
+      commonTable.getTable().getColumnModel().getColumn(0).setMaxWidth(0);
+      commonTable.getTable().getColumnModel().getColumn(0).setWidth(0);
+    }
+
   }
 
   /** Editの切り替え */

@@ -171,7 +171,7 @@ public class CommonTable extends JTable {
         return i;
       }
     }
-    throw new IllegalArgumentException("Invalid column name: " + columnName);
+    return -1;
   }
 
   /** データをリロードするメソッド */
