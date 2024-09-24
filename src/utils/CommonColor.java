@@ -15,6 +15,16 @@ public class CommonColor {
     return new Color(0x3f51b5);
   }
 
+  /** mui 青 */
+  public Color commonMUIBlue() {
+    return new Color(0x1976D2);
+  }
+
+  /** mui 赤 */
+  public Color commonMUIRed() {
+    return new Color(0xd32f2f);
+  }
+
   /** 黒 */
   public Color commonBlack() {
     return new Color(0x000000);

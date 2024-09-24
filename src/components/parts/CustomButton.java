@@ -2,14 +2,12 @@ package src.components.parts;
 
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
-import javax.swing.JPanel;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -21,6 +19,7 @@ public final class CustomButton extends JButton {
   private Color buttonBorderColor;
   private CommonColor commonColor = new CommonColor();
   private Insets insets = new Insets(5, 10, 5, 10);
+  private ActionListener actionListener;
 
   /**
    * ボタンを追加
@@ -32,22 +31,19 @@ public final class CustomButton extends JButton {
    * @param gridWidth  列幅を設定
    * @param listener   ボタンのクリック時に実行するアクションリスナー
    */
-  public void addButton(JPanel innerPanel, String buttonText, int gridX, int gridY, int gridWidth,
-      ActionListener listener, Color borderColor) {
+  public void addButton(String buttonText, int gridX, int gridY, int gridWidth, ActionListener listener,
+      Color borderColor) {
 
     this.buttonBorderColor = borderColor;
 
     this.setText(buttonText);
     this.addActionListener(listener);
 
-    GridBagConstraints innerGbc = new GridBagConstraints();
-
-    innerGbc.gridx = gridX; // 配置する列
-    innerGbc.gridy = gridY; // 配置する行
-    innerGbc.gridwidth = gridWidth; // 列幅を設定
-    innerGbc.fill = GridBagConstraints.NONE; // ボタンの横幅を自動調整
-    innerGbc.anchor = GridBagConstraints.EAST; // 右寄せ
-    innerPanel.add(this, innerGbc);
+    this.addActionListener(e -> {
+      if (actionListener != null) {
+        actionListener.actionPerformed(e);
+      }
+    });
 
     // ポインターを変更する
     this.setCursor(new Cursor(Cursor.HAND_CURSOR));

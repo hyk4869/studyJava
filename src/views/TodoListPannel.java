@@ -33,8 +33,11 @@ import src.components.table.override.checkbox.CheckBoxRenderer;
 import src.dataBase.PostgreSQLConnection;
 import src.dataBase.query.TodoListPannelQuery;
 import src.tab.CommonTab;
+import src.tab.footer.FooterButtons;
+import src.tab.footer.FooterButtonsInterface;
+import src.utils.CommonColor;
 
-public class TodoListPannel implements ActionListener {
+public class TodoListPannel implements ActionListener, FooterButtonsInterface {
 
   private CommonTable commonTable;
   private CommonTab commonTab = new CommonTab();
@@ -44,7 +47,15 @@ public class TodoListPannel implements ActionListener {
   private boolean isEditable = false;
   private HashSet<Integer> modifiedRows = new HashSet<>();
   private TableColumns tableColumns = new TableColumns();
+  private CommonColor commonColor = new CommonColor();
+  private CustomButton addTodoButton = new CustomButton();
 
+  public CustomButton saveButton;
+  public CustomButton reloadButton;
+  public CustomButton deleteButton;
+  public CustomButton editButton;
+
+  /** テーブルのデータモデルに変更があった場合の変更をキャッチ */
   private TableModelListener tableModelListener = new TableModelListener() {
     @Override
     public void tableChanged(TableModelEvent e) {
@@ -73,19 +84,30 @@ public class TodoListPannel implements ActionListener {
 
   /** mainメソッドにTodoListタブとその中身を生成 */
   public void GenerateTodoListTab(JTabbedPane tabbedPane) {
+
     Map<String, String> fieldConfigs = new LinkedHashMap<>();
     fieldConfigs.put("title", "text");
     fieldConfigs.put("description", "textArea");
     fieldConfigs.put("isCompleted", "check");
 
+    // innerPanelの作成
+    JPanel innerPanel = commonTab.createInnerPanel("Add Your Todo", fieldConfigs, TextFieldStyle.STANDARD, 1);
+
+    // TODO: 何を表示するのかを後で考える
     commonTable = new CommonTable(tableColumns.TODO_LIST_COLUMNS, isEditable);
 
     commonTable.getTableModel().addTableModelListener(tableModelListener);
 
-    // innerPanelの作成
-    JPanel innerPanel = commonTab.createInnerPanel("Add Your Todo", fieldConfigs, TextFieldStyle.STANDARD, 1);
-    // formPanelの作成
+    /** メインパネルの作成 */
+    JPanel mainPanel = new JPanel(new BorderLayout());
+    /** 入力部分の作成 */
     JPanel formPanel = new JPanel(new GridBagLayout());
+    /** テーブルのパネル作成 */
+    JPanel tablePanel = commonTable.createTablePanel("Todo List");
+    /** ボタンのパネル作成 */
+    JPanel buttonPanel = new JPanel();
+
+    FooterButtons footerButtons = new FooterButtons();
 
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.gridx = 0;
@@ -97,62 +119,21 @@ public class TodoListPannel implements ActionListener {
 
     formPanel.add(innerPanel, gbc);
 
-    // CustomButtonを使ってボタンを追加
-    CustomButton addTodoButton = new CustomButton();
-    addTodoButton.addButton(innerPanel, "Add Todo to List", gbc.gridx, gbc.gridy, gbc.gridwidth, this);
+    addTodoButton.addButton("Add Todo to List", gbc.gridx, gbc.gridy, gbc.gridwidth, this,
+        commonColor.commonMUIBlue());
+    gbc.fill = GridBagConstraints.NONE;
+    gbc.anchor = GridBagConstraints.EAST;
+    innerPanel.add(addTodoButton, gbc);
 
-    // メインパネルの作成
-    JPanel mainPanel = new JPanel(new BorderLayout());
-
-    JPanel tablePanel = commonTable.createTablePanel("Todo List");
-
-    JPanel buttonPanel = new JPanel();
-
-    CustomButton saveButton = new CustomButton();
-    saveButton.setVisible(false);
-    saveButton.addButton(buttonPanel, "Save", gbc.gridx, gbc.gridy, gbc.gridwidth, new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        saveModifiedRows();
+    saveButton = footerButtons.generateSaveButton(e -> saveModifiedRows());
+    reloadButton = footerButtons.generateReloadButoon(e -> loadAllTodoItems());
+    deleteButton = footerButtons.generateDeleteButoon(e -> {
+      List<String> idsToDelete = commonTable.deleteSelectedRows();
+      if (!idsToDelete.isEmpty()) {
+        deleteFromDatabase(idsToDelete);
       }
     });
-
-    CustomButton reloadButton = new CustomButton();
-    reloadButton.addButton(buttonPanel, "Reload", gbc.gridx, gbc.gridy, gbc.gridwidth, new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        loadAllTodoItems();
-      }
-    });
-
-    CustomButton deleteButton = new CustomButton();
-    deleteButton.setVisible(false);
-    deleteButton.addButton(buttonPanel, "Delete", gbc.gridx, gbc.gridy, gbc.gridwidth, new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        List<String> idsToDelete = commonTable.deleteSelectedRows();
-        if (!idsToDelete.isEmpty()) {
-          deleteFromDatabase(idsToDelete);
-        }
-      }
-    });
-
-    CustomButton editButton = new CustomButton();
-    editButton.addButton(buttonPanel, "Edit", gbc.gridx, gbc.gridy, gbc.gridwidth, new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        isEditable = !isEditable;
-        commonTable.setEditable(isEditable);
-        editButton.setText(isEditable ? "Cancel" : "Edit");
-        saveButton.setVisible(isEditable);
-        deleteButton.setVisible(isEditable);
-        reloadButton.setEnabled(!isEditable);
-        configureIsCompletedColumn(commonTable.getTable());
-
-        commonTable.getTableModel().removeTableModelListener(tableModelListener);
-        commonTable.getTableModel().addTableModelListener(tableModelListener);
-      }
-    });
+    editButton = footerButtons.generateEditButoon(e -> changeEdit());
 
     buttonPanel.add(saveButton);
     buttonPanel.add(editButton);
@@ -162,8 +143,8 @@ public class TodoListPannel implements ActionListener {
     tablePanel.add(buttonPanel, BorderLayout.SOUTH);
 
     // メインパネルにフォームとテーブルを追加
-    mainPanel.add(formPanel, BorderLayout.NORTH); // フォームを上部に配置
-    mainPanel.add(tablePanel, BorderLayout.CENTER); // テーブルを枠で囲んで下部に配置
+    mainPanel.add(formPanel, BorderLayout.NORTH);
+    mainPanel.add(tablePanel, BorderLayout.CENTER);
 
     configureIsCompletedColumn(commonTable.getTable());
 
@@ -172,20 +153,61 @@ public class TodoListPannel implements ActionListener {
     loadAllTodoItems();
   }
 
+  public void changeEdit() {
+    isEditable = !isEditable;
+    commonTable.setEditable(isEditable);
+    editButton.setText(isEditable ? "Cancel" : "Edit");
+    saveButton.setVisible(isEditable);
+    deleteButton.setVisible(isEditable);
+    reloadButton.setEnabled(!isEditable);
+    configureIsCompletedColumn(commonTable.getTable());
+
+    commonTable.getTableModel().removeTableModelListener(tableModelListener);
+    commonTable.getTableModel().addTableModelListener(tableModelListener);
+  }
+
   /** ResultSetから1行分のデータを取得 */
   private ArrayList<Object> getRowData(ResultSet resultSet) throws SQLException {
     ArrayList<Object> rowData = new ArrayList<>();
     int columnCount = commonTable.getTableModel().getColumnCount();
 
+    // printResultSetRow(resultSet);
+
     // 最後の列 "Select" を無視するため、columnCount - 1 にする
     for (int i = 0; i < columnCount - 1; i++) {
       String columnName = commonTable.getTableModel().getColumnName(i);
       if (!columnName.equals("Delete")) { // "Delete" 列を無視
-        rowData.add(resultSet.getObject(columnName));
+        try {
+          // "Delete" カラムは無視
+          if (!columnName.equals("Delete")) {
+            // ResultSet からカラム名に対応するデータを取得
+            Object value = resultSet.getObject(columnName);
+            rowData.add(value);
+          }
+        } catch (SQLException e) {
+          // カラムが一致しなかった場合
+          System.out.println("カラムが一致しません: " + columnName);
+        }
       }
     }
     return rowData;
   }
+
+  // private void printResultSetRow(ResultSet resultSet) throws SQLException {
+  // // メタデータを取得
+  // int columnCount = resultSet.getMetaData().getColumnCount();
+
+  // System.out.println("------ ResultSet Row ------");
+
+  // // 各カラム名とその値を見やすく表示
+  // for (int i = 1; i <= columnCount; i++) {
+  // String columnName = resultSet.getMetaData().getColumnName(i);
+  // Object value = resultSet.getObject(i);
+  // System.out.printf("%-20s : %s%n", columnName, value);
+  // }
+
+  // System.out.println("---------------------------");
+  // }
 
   /** T_TodoListの全データをロードしてテーブルに追加 */
   private void loadAllTodoItems() {
@@ -240,11 +262,16 @@ public class TodoListPannel implements ActionListener {
       for (Integer rowIndex : validModifiedRows) {
         int modelRowIndex = commonTable.convertRowIndexToModel(rowIndex);
 
-        String id = (String) commonTable.getTableModel().getValueAt(modelRowIndex, 0);
-        String title = (String) commonTable.getTableModel().getValueAt(modelRowIndex, 1);
-        String description = (String) commonTable.getTableModel().getValueAt(modelRowIndex, 2);
-        Boolean isCompleted = (Boolean) commonTable.getTableModel().getValueAt(modelRowIndex, 7);
-        Integer sort = (Integer) commonTable.getTableModel().getValueAt(modelRowIndex, 8);
+        String id = (String) commonTable.getTableModel().getValueAt(modelRowIndex,
+            commonTable.getColumnIndexByName("id"));
+        String title = (String) commonTable.getTableModel().getValueAt(modelRowIndex,
+            commonTable.getColumnIndexByName("title"));
+        String description = (String) commonTable.getTableModel().getValueAt(modelRowIndex,
+            commonTable.getColumnIndexByName("description"));
+        Boolean isCompleted = (Boolean) commonTable.getTableModel().getValueAt(modelRowIndex,
+            commonTable.getColumnIndexByName("isCompleted"));
+        Integer sort = (Integer) commonTable.getTableModel().getValueAt(modelRowIndex,
+            commonTable.getColumnIndexByName("sort"));
 
         // タイトルの重複チェック
         if (todoQuery.isTitleDuplicated(title, id)) {
@@ -257,6 +284,8 @@ public class TodoListPannel implements ActionListener {
 
       loadAllTodoItems();
       connection.commit();
+      modifiedRows.clear();
+
     } catch (SQLException ex) {
       try {
         connection.rollback();
@@ -265,8 +294,6 @@ public class TodoListPannel implements ActionListener {
         rollbackEx.printStackTrace();
       }
       ex.printStackTrace();
-    } finally {
-      modifiedRows.clear();
     }
   }
 
@@ -314,6 +341,12 @@ public class TodoListPannel implements ActionListener {
     commonTab.setFieldValue("title", "");
     commonTab.setFieldValue("description", "");
     commonTab.setFieldValue("isCompleted", false);
+  }
+
+  @Override
+  public void onEditModeChanged(boolean isEditable) {
+    this.isEditable = isEditable;
+    configureIsCompletedColumn(commonTable.getTable());
   }
 
 }

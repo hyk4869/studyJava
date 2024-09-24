@@ -12,10 +12,12 @@ import src.components.enums.TextFieldStyle;
 import src.components.parts.CustomButton;
 import src.dataBase.PostgreSQLConnection;
 import src.tab.CommonTab;
+import src.utils.CommonColor;
 
 public class SearchTodoPannel {
 
   private PostgreSQLConnection connection;
+  private CommonColor commonColor = new CommonColor();
 
   public SearchTodoPannel(PostgreSQLConnection connection) {
     this.connection = connection;
@@ -39,13 +41,13 @@ public class SearchTodoPannel {
 
     // CustomButtonを使ってボタンを追加
     CustomButton customButton = new CustomButton();
-    customButton.addButton(innerPanel, "Search Todo", 2, (fieldConfigs.size() + 2) / 3, 1, new ActionListener() {
+    customButton.addButton("Search Todo", 2, (fieldConfigs.size() + 2) / 3, 1, new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
         // JOptionPane.showMessageDialog(null, "Search button clicked!");
         System.out.println("click search button");
       };
-    });
+    }, commonColor.commonBlue());
 
   }
 }
