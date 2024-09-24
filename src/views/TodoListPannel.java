@@ -24,6 +24,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 
 import src.components.enums.TextFieldStyle;
+import src.components.labels.FieldLabel;
 import src.components.parts.CustomButton;
 import src.components.table.CommonTable;
 import src.components.table.columns.TableColumns;
@@ -39,7 +40,7 @@ import src.utils.CommonColor;
 public class TodoListPannel implements ActionListener, FooterButtonsInterface {
 
   private CommonTable commonTable;
-  private CommonTab commonTab = new CommonTab();
+  private CommonTab commonTab;
   private PostgreSQLConnection connection;
   private TodoListPannelQuery todoQuery;
   /** テーブルの編集 */
@@ -48,6 +49,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
   private TableColumns tableColumns = new TableColumns();
   private CommonColor commonColor = new CommonColor();
   private CustomButton addTodoButton = new CustomButton();
+  private FieldLabel fieldLabel = new FieldLabel();
 
   public CustomButton saveButton;
   public CustomButton reloadButton;
@@ -70,17 +72,6 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     this.connection = connection;
   }
 
-  /** overrideしたカラムの読み込み */
-  private void reloadOverridedColumn(JTable table) {
-    TableColumn isCompletedColumn = table.getColumnModel().getColumn(7);
-    isCompletedColumn.setCellRenderer(new CheckBoxRenderer());
-    isCompletedColumn.setCellEditor(new CheckBoxEditor(new JCheckBox()));
-
-    commonTable.getTable().getColumnModel().getColumn(0).setMinWidth(0);
-    commonTable.getTable().getColumnModel().getColumn(0).setMaxWidth(0);
-    commonTable.getTable().getColumnModel().getColumn(0).setWidth(0);
-  }
-
   /** mainメソッドにTodoListタブとその中身を生成 */
   public void GenerateTodoListTab(JTabbedPane tabbedPane) {
 
@@ -89,11 +80,13 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     fieldConfigs.put("description", "textArea");
     fieldConfigs.put("isCompleted", "check");
 
+    commonTab = new CommonTab();
     // innerPanelの作成
-    JPanel innerPanel = commonTab.createInnerPanel("Add Your Todo", fieldConfigs, TextFieldStyle.STANDARD, 1);
+    JPanel innerPanel = commonTab.createInnerPanel("Add Your Todo", fieldConfigs, fieldLabel.TODO_FIELD_LABELS,
+        TextFieldStyle.STANDARD, 1);
 
     // TODO: 何を表示するのかを後で考える
-    commonTable = new CommonTable(tableColumns.TODO_LIST_COLUMNS, isEditable);
+    commonTable = new CommonTable(tableColumns.TODO_LIST_COLUMNS, isEditable, tableColumns.TODO_LIST_COLUMN_LABELS);
 
     commonTable.getTableModel().addTableModelListener(tableModelListener);
 
@@ -163,6 +156,19 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     } catch (SQLException ex) {
       ex.printStackTrace();
     }
+  }
+
+  /** overrideしたカラムの読み込み */
+  private void reloadOverridedColumn(JTable table) {
+    commonTable.overrideColumnLabel();
+
+    TableColumn isCompletedColumn = table.getColumnModel().getColumn(7);
+    isCompletedColumn.setCellRenderer(new CheckBoxRenderer());
+    isCompletedColumn.setCellEditor(new CheckBoxEditor(new JCheckBox()));
+
+    commonTable.getTable().getColumnModel().getColumn(0).setMinWidth(0);
+    commonTable.getTable().getColumnModel().getColumn(0).setMaxWidth(0);
+    commonTable.getTable().getColumnModel().getColumn(0).setWidth(0);
   }
 
   /** Editの切り替え */

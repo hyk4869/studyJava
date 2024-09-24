@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -22,14 +23,27 @@ public class CommonTable extends JTable {
   private DefaultTableModel tableModel;
   private boolean isEditable;
   private boolean checkBoxColumnAdded = false;
+  private List<String> columnNames;
+  private Map<String, String> columnLabels;
 
-  public CommonTable(List<String> columnNames, boolean isEditable) {
+  public CommonTable(List<String> columnNames, boolean isEditable, Map<String, String> columnLabels) {
     super(new DefaultTableModel(columnNames.toArray(), 0));
+    this.columnNames = columnNames;
+    this.columnLabels = columnLabels;
 
     this.tableModel = (DefaultTableModel) this.getModel();
     this.isEditable = isEditable;
     this.setRowSorter(new TableRowSorter<>(tableModel));
     this.setRowHeight(30);
+  }
+
+  /** テーブルのカラムを日本語対応できるように */
+  public void overrideColumnLabel() {
+    for (int i = 0; i < columnNames.size(); i++) {
+      String englishColumnName = columnNames.get(i);
+      String japaneseLabel = columnLabels.getOrDefault(englishColumnName, englishColumnName);
+      getColumnModel().getColumn(i).setHeaderValue(japaneseLabel);
+    }
   }
 
   /** テーブルモデルを取得 */

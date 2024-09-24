@@ -46,8 +46,87 @@ public class CommonTab {
     UIManager.put("TabbedPane.font", new FontUIResource(commonFont.commonNotoSansCJKJP(14)));
   }
 
+  /** タブパネルを作成して返す */
+  public JPanel createInnerPanel(String title, Map<String, String> fieldConfigs, Map<String, String> customLabel,
+      TextFieldStyle style, int columns) {
+    JPanel innerPanel = createPannel.createInnerPanel(title);
+    addFields(innerPanel, fieldConfigs, customLabel, style, columns);
+    return innerPanel;
+  }
+
   /** 指定した各テキストフィールドの追加 */
-  private void addFields(JPanel innerPanel, Map<String, String> fieldConfigs, TextFieldStyle style, int columns) {
+  private void addFields(JPanel innerPanel, Map<String, String> fieldConfigs, Map<String, String> customLabel,
+      TextFieldStyle style, int columns) {
+    GridBagConstraints innerGbc = new GridBagConstraints();
+    innerGbc.insets = new Insets(10, 10, 10, 10);
+
+    int index = 0;
+    for (Map.Entry<String, String> entry : fieldConfigs.entrySet()) {
+      String labelText = entry.getKey();
+      String fieldType = entry.getValue();
+
+      String japaneseLabel = customLabel.getOrDefault(labelText, labelText);
+
+      CustomLabeledComponent labeledComponent;
+      Object field = null;
+
+      // フィールドタイプに応じてコンポーネントを選択
+      if ("numeric".equalsIgnoreCase(fieldType)) {
+        CustomNumericField numericField = new CustomNumericField(20, style, 14);
+        labeledComponent = new CustomLabeledComponent(japaneseLabel, numericField);
+        field = numericField;
+
+      } else if ("date".equalsIgnoreCase(fieldType)) {
+        CustomDateField dateField = new CustomDateField(20, style, 14);
+        labeledComponent = new CustomLabeledComponent(japaneseLabel, dateField);
+        field = dateField;
+
+      } else if ("check".equalsIgnoreCase(fieldType)) {
+        CustomCheckBox checkBox = new CustomCheckBox("isCompleted");
+        labeledComponent = new CustomLabeledComponent(japaneseLabel, checkBox);
+        field = checkBox;
+
+      } else if ("textArea".equalsIgnoreCase(fieldType)) {
+        CustomTextArea customTextArea = new CustomTextArea(5, 20, style, 14);
+
+        customTextArea.setLineWrap(true);
+        customTextArea.setWrapStyleWord(true);
+
+        JScrollPane scrollPane = new JScrollPane(customTextArea);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+
+        // 固定サイズを指定せずに、行数・列数に基づく
+        customTextArea.setPreferredSize(null);
+
+        labeledComponent = new CustomLabeledComponent(japaneseLabel, scrollPane);
+        field = customTextArea;
+
+      } else {
+        CustomTextField textFieldStandard = new CustomTextField(20, style, 14);
+        labeledComponent = new CustomLabeledComponent(japaneseLabel, textFieldStandard);
+        field = textFieldStandard;
+
+      }
+
+      innerGbc.gridx = index % columns; // 指定された列数に基づいて配置
+      innerGbc.gridy = index / columns; // 行
+      innerGbc.fill = GridBagConstraints.HORIZONTAL; // 横方向に広げる
+      innerGbc.weightx = 1.0; // 余分なスペースがあれば均等に配分
+      innerGbc.anchor = GridBagConstraints.WEST; // 左寄せ
+      innerPanel.add(labeledComponent, innerGbc);
+
+      components.add(labeledComponent);
+
+      fieldMap.put(labelText, field);
+
+      index++;
+    }
+  }
+
+  /** オーバーロードしたもの */
+  private void addFields(JPanel innerPanel, Map<String, String> fieldConfigs,
+      TextFieldStyle style, int columns) {
     GridBagConstraints innerGbc = new GridBagConstraints();
     innerGbc.insets = new Insets(10, 10, 10, 10);
 
@@ -139,13 +218,6 @@ public class CommonTab {
     } else if (field instanceof JTextArea) {
       ((JTextArea) field).setText((String) value);
     }
-  }
-
-  /** タブパネルを作成して返す */
-  public JPanel createInnerPanel(String title, Map<String, String> fieldConfigs, TextFieldStyle style, int columns) {
-    JPanel innerPanel = createPannel.createInnerPanel(title);
-    addFields(innerPanel, fieldConfigs, style, columns);
-    return innerPanel;
   }
 
   /** 内部パネルをメインパネルに追加 */
