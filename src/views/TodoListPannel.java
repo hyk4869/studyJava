@@ -87,7 +87,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
         TextFieldStyle.STANDARD, 1);
 
     List<String> newTodoListColumn = tableColumns.pickColumns(tableColumns.TODO_LIST_COLUMNS,
-        Arrays.asList("title", "description", "isCompleted", "sort", "updatedAt"));
+        Arrays.asList("id", "title", "description", "isCompleted", "sort", "updatedAt"));
 
     commonTable = new CommonTable(newTodoListColumn, isEditable, tableColumns.TODO_LIST_COLUMN_LABELS);
 
