@@ -23,7 +23,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 
-import src.components.enums.DefaultSortDateType;
 import src.components.enums.TextFieldStyle;
 import src.components.parts.CustomButton;
 import src.components.table.CommonTable;
@@ -71,8 +70,8 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     this.connection = connection;
   }
 
-  /** isCompletedカラムの設定を行う */
-  private void configureIsCompletedColumn(JTable table) {
+  /** overrideしたカラムの読み込み */
+  private void reloadOverridedColumn(JTable table) {
     TableColumn isCompletedColumn = table.getColumnModel().getColumn(7);
     isCompletedColumn.setCellRenderer(new CheckBoxRenderer());
     isCompletedColumn.setCellEditor(new CheckBoxEditor(new JCheckBox()));
@@ -126,7 +125,14 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     innerPanel.add(addTodoButton, gbc);
 
     saveButton = footerButtons.generateSaveButton(e -> saveModifiedRows());
-    reloadButton = footerButtons.generateReloadButoon(e -> loadAllTodoItems());
+    reloadButton = footerButtons.generateReloadButoon(e -> {
+      try {
+        ResultSet resultSet = todoQuery.getAllTodoItems();
+        commonTable.loadAllTodoItems(resultSet);
+      } catch (SQLException ex) {
+        ex.printStackTrace();
+      }
+    });
     deleteButton = footerButtons.generateDeleteButoon(e -> {
       List<String> idsToDelete = commonTable.deleteSelectedRows();
       if (!idsToDelete.isEmpty()) {
@@ -146,13 +152,20 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     mainPanel.add(formPanel, BorderLayout.NORTH);
     mainPanel.add(tablePanel, BorderLayout.CENTER);
 
-    configureIsCompletedColumn(commonTable.getTable());
+    reloadOverridedColumn(commonTable.getTable());
 
     // メインパネルをタブに追加
     tabbedPane.addTab("Add Todo", mainPanel);
-    loadAllTodoItems();
+
+    try {
+      ResultSet resultSet = todoQuery.getAllTodoItems();
+      commonTable.loadAllTodoItems(resultSet);
+    } catch (SQLException ex) {
+      ex.printStackTrace();
+    }
   }
 
+  /** Editの切り替え */
   public void changeEdit() {
     isEditable = !isEditable;
     commonTable.setEditable(isEditable);
@@ -160,69 +173,10 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     saveButton.setVisible(isEditable);
     deleteButton.setVisible(isEditable);
     reloadButton.setEnabled(!isEditable);
-    configureIsCompletedColumn(commonTable.getTable());
+    reloadOverridedColumn(commonTable.getTable());
 
     commonTable.getTableModel().removeTableModelListener(tableModelListener);
     commonTable.getTableModel().addTableModelListener(tableModelListener);
-  }
-
-  /** ResultSetから1行分のデータを取得 */
-  private ArrayList<Object> getRowData(ResultSet resultSet) throws SQLException {
-    ArrayList<Object> rowData = new ArrayList<>();
-    int columnCount = commonTable.getTableModel().getColumnCount();
-
-    // printResultSetRow(resultSet);
-
-    // 最後の列 "Select" を無視するため、columnCount - 1 にする
-    for (int i = 0; i < columnCount - 1; i++) {
-      String columnName = commonTable.getTableModel().getColumnName(i);
-      if (!columnName.equals("Delete")) { // "Delete" 列を無視
-        try {
-          // "Delete" カラムは無視
-          if (!columnName.equals("Delete")) {
-            // ResultSet からカラム名に対応するデータを取得
-            Object value = resultSet.getObject(columnName);
-            rowData.add(value);
-          }
-        } catch (SQLException e) {
-          // カラムが一致しなかった場合
-          System.out.println("カラムが一致しません: " + columnName);
-        }
-      }
-    }
-    return rowData;
-  }
-
-  // private void printResultSetRow(ResultSet resultSet) throws SQLException {
-  // // メタデータを取得
-  // int columnCount = resultSet.getMetaData().getColumnCount();
-
-  // System.out.println("------ ResultSet Row ------");
-
-  // // 各カラム名とその値を見やすく表示
-  // for (int i = 1; i <= columnCount; i++) {
-  // String columnName = resultSet.getMetaData().getColumnName(i);
-  // Object value = resultSet.getObject(i);
-  // System.out.printf("%-20s : %s%n", columnName, value);
-  // }
-
-  // System.out.println("---------------------------");
-  // }
-
-  /** T_TodoListの全データをロードしてテーブルに追加 */
-  private void loadAllTodoItems() {
-    try (ResultSet resultSet = todoQuery.getAllTodoItems()) {
-      List<ArrayList<Object>> rows = new ArrayList<>();
-
-      while (resultSet.next()) {
-        rows.add(getRowData(resultSet)); // データをリストに追加
-      }
-
-      commonTable.reloadTableData(rows, DefaultSortDateType.updatedAt);
-
-    } catch (SQLException ex) {
-      ex.printStackTrace();
-    }
   }
 
   /** DBから削除 */
@@ -230,7 +184,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     try {
       todoQuery.deleteTodoItemsByIds(idsToDelete.toArray(new String[0]));
 
-      loadAllTodoItems();
+      commonTable.loadAllTodoItems(todoQuery.getAllTodoItems());
 
       connection.commit();
       System.out.println("Selected rows deleted successfully.");
@@ -244,6 +198,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     }
   }
 
+  /** DB更新処理 */
   private void saveModifiedRows() {
     if (commonTable.getTable().getCellEditor() != null) {
       commonTable.getTable().getCellEditor().stopCellEditing();
@@ -282,7 +237,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
         todoQuery.updateTodoItem(id, title, description, isCompleted, sort);
       }
 
-      loadAllTodoItems();
+      commonTable.loadAllTodoItems(todoQuery.getAllTodoItems());
       connection.commit();
       modifiedRows.clear();
 
@@ -297,6 +252,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     }
   }
 
+  /** DBに追加 */
   @Override
   public void actionPerformed(ActionEvent e) {
     String title = (String) commonTab.getFieldValue("title");
@@ -321,9 +277,8 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
       todoQuery.insertTodoItem(id, createdById, createdByName, updatedById, updatedByName, currentTimestamp,
           currentTimestamp, title, description, isCompleted);
 
-      loadAllTodoItems();
+      commonTable.loadAllTodoItems(todoQuery.getAllTodoItems());
 
-      // コミット
       connection.commit();
       System.out.println("Todo item inserted and committed successfully.");
 
@@ -346,7 +301,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
   @Override
   public void onEditModeChanged(boolean isEditable) {
     this.isEditable = isEditable;
-    configureIsCompletedColumn(commonTable.getTable());
+    reloadOverridedColumn(commonTable.getTable());
   }
 
 }

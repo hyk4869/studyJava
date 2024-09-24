@@ -2,6 +2,8 @@ package src.components.table;
 
 import java.awt.BorderLayout;
 import java.sql.Timestamp;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -169,4 +171,42 @@ public class CommonTable extends JTable {
         .forEach(d -> addRow(d));
   }
 
+  /** 全データをロードしてテーブルに追加 */
+  public void loadAllTodoItems(ResultSet resultSet) {
+    try (resultSet) {
+      List<ArrayList<Object>> rows = new ArrayList<>();
+
+      while (resultSet.next()) {
+        rows.add(getRowData(resultSet)); // データをリストに追加
+      }
+
+      reloadTableData(rows, DefaultSortDateType.updatedAt);
+
+    } catch (SQLException ex) {
+      ex.printStackTrace();
+    }
+  }
+
+  /** ResultSetから1行分のデータを取得 */
+  private ArrayList<Object> getRowData(ResultSet resultSet) throws SQLException {
+    ArrayList<Object> rowData = new ArrayList<>();
+    int columnCount = getTableModel().getColumnCount();
+
+    // 最後の列 "Select" を無視するため、columnCount - 1 にする
+    for (int i = 0; i < columnCount - 1; i++) {
+      String columnName = getTableModel().getColumnName(i);
+      if (!columnName.equals("Delete")) {
+        try {
+          if (!columnName.equals("Delete")) {
+            // ResultSet からカラム名に対応するデータを取得
+            Object value = resultSet.getObject(columnName);
+            rowData.add(value);
+          }
+        } catch (SQLException e) {
+          System.out.println("カラムが一致しません: " + columnName);
+        }
+      }
+    }
+    return rowData;
+  }
 }
