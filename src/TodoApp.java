@@ -44,6 +44,7 @@ public class TodoApp {
       @Override
       public void windowClosing(WindowEvent e) {
         connection.closeConnection();
+        System.out.println("Connection closed successfully.");
       }
     });
 
