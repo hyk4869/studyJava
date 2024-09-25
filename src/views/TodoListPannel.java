@@ -45,6 +45,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
   private CommonColor commonColor = new CommonColor();
   private CustomButton addTodoButton = new CustomButton();
   private FieldLabel fieldLabel = new FieldLabel();
+  public FooterButtons footerButtons = new FooterButtons();
 
   public CustomButton saveButton;
   public CustomButton reloadButton;
@@ -93,7 +94,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     /** ボタンのパネル作成 */
     JPanel buttonPanel = new JPanel();
 
-    FooterButtons footerButtons = new FooterButtons();
+    // FooterButtons footerButtons = new FooterButtons();
 
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.gridx = 0;
@@ -111,22 +112,27 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     gbc.anchor = GridBagConstraints.EAST;
     innerPanel.add(addTodoButton, gbc);
 
-    saveButton = footerButtons.generateSaveButton(e -> saveModifiedRows());
-    reloadButton = footerButtons.generateReloadButoon(e -> {
+    // FooterButton
+    saveButton = footerButtons.generateFooterButton("Save", e -> saveModifiedRows(), false,
+        commonColor.commonMUIBlue());
+
+    reloadButton = footerButtons.generateFooterButton("Reload", e -> {
       try {
         ResultSet resultSet = todoQuery.getAllTodoItems();
         commonTable.loadAllTodoItems(resultSet);
       } catch (SQLException ex) {
         ex.printStackTrace();
       }
-    });
-    deleteButton = footerButtons.generateDeleteButoon(e -> {
+    }, true, commonColor.commonMUIBlue());
+
+    deleteButton = footerButtons.generateFooterButton("Delete", e -> {
       List<String> idsToDelete = commonTable.deleteSelectedRows();
       if (!idsToDelete.isEmpty()) {
         deleteFromDatabase(idsToDelete);
       }
-    });
-    editButton = footerButtons.generateEditButoon(e -> changeEdit());
+    }, false, commonColor.commonMUIRed());
+
+    editButton = footerButtons.generateFooterButton("Edit", e -> changeEdit(), true, commonColor.commonMUIBlue());
 
     buttonPanel.add(saveButton);
     buttonPanel.add(editButton);
@@ -235,6 +241,8 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
         rollbackEx.printStackTrace();
       }
       ex.printStackTrace();
+    } finally {
+      changeEdit();
     }
   }
 

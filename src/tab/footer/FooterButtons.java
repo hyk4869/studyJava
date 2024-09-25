@@ -1,21 +1,17 @@
 package src.tab.footer;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
 
 import src.components.parts.CustomButton;
-import src.utils.CommonColor;
 
 public class FooterButtons {
 
   private final GridBagConstraints gbc = new GridBagConstraints();
-  private CommonColor commonColor = new CommonColor();
 
-  private CustomButton saveButton = new CustomButton();
-  private CustomButton reloadButton = new CustomButton();
-  private CustomButton deleteButton = new CustomButton();
-  private CustomButton editButton = new CustomButton();
+  private CustomButton customFooterButton;
 
   public FooterButtons() {
     gbc.gridx = 0;
@@ -27,25 +23,14 @@ public class FooterButtons {
     gbc.insets = new Insets(10, 0, 0, 0);
   }
 
-  public CustomButton generateSaveButton(ActionListener callback) {
-    saveButton.setVisible(false);
-    saveButton.addButton("Save", gbc.gridx, gbc.gridy, gbc.gridwidth, callback, commonColor.commonMUIBlue());
-    return saveButton;
+  public CustomButton generateFooterButton(String title, ActionListener callback, boolean isVisible, Color color) {
+    this.customFooterButton = new CustomButton();
+    customFooterButton.setVisible(isVisible);
+    customFooterButton.addButton(title, gbc.gridx, gbc.gridy, gbc.gridwidth, callback, color);
+    return customFooterButton;
   }
 
-  public CustomButton generateReloadButoon(ActionListener callback) {
-    reloadButton.addButton("Reload", gbc.gridx, gbc.gridy, gbc.gridwidth, callback, commonColor.commonMUIBlue());
-    return reloadButton;
-  }
-
-  public CustomButton generateDeleteButoon(ActionListener callback) {
-    deleteButton.setVisible(false);
-    deleteButton.addButton("Delete", gbc.gridx, gbc.gridy, gbc.gridwidth, callback, commonColor.commonMUIRed());
-    return deleteButton;
-  }
-
-  public CustomButton generateEditButoon(ActionListener callback) {
-    editButton.addButton("Edit", gbc.gridx, gbc.gridy, gbc.gridwidth, callback, commonColor.commonMUIBlue());
-    return editButton;
+  public void getButton() {
+    System.out.println(this.customFooterButton.getText());
   }
 }
