@@ -12,25 +12,19 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
-import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.TableColumn;
 
 import src.components.enums.TextFieldStyle;
 import src.components.labels.FieldLabel;
 import src.components.parts.CustomButton;
 import src.components.table.CommonTable;
 import src.components.table.columns.TableColumns;
-import src.components.table.override.checkbox.CheckBoxEditor;
-import src.components.table.override.checkbox.CheckBoxRenderer;
 import src.dataBase.PostgreSQLConnection;
 import src.dataBase.query.TodoListPannelQuery;
 import src.tab.CommonTab;
@@ -76,17 +70,14 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
   /** mainメソッドにTodoListタブとその中身を生成 */
   public void GenerateTodoListTab(JTabbedPane tabbedPane) {
 
-    Map<String, String> fieldConfigs = new LinkedHashMap<>();
-    fieldConfigs.put("title", "text");
-    fieldConfigs.put("description", "textArea");
-    fieldConfigs.put("isCompleted", "check");
-
     commonTab = new CommonTab();
+
     // innerPanelの作成
-    JPanel innerPanel = commonTab.createInnerPanel("Add Your Todo", fieldConfigs, fieldLabel.TODO_FIELD_LABELS,
+    JPanel innerPanel = commonTab.createInnerPanel("Add Your Todo", fieldLabel.TODO_FIELD_CONFIGS,
+        fieldLabel.TODO_FIELD_LABELS,
         TextFieldStyle.STANDARD, 1);
 
-    List<String> newTodoListColumn = tableColumns.pickColumns(tableColumns.TODO_LIST_COLUMNS,
+    Map<String, String> newTodoListColumn = tableColumns.pickColumns(tableColumns.TODO_LIST_COLUMNS,
         Arrays.asList("id", "title", "description", "isCompleted", "sort", "updatedAt"));
 
     commonTable = new CommonTable(newTodoListColumn, isEditable, tableColumns.TODO_LIST_COLUMN_LABELS);
@@ -148,7 +139,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     mainPanel.add(formPanel, BorderLayout.NORTH);
     mainPanel.add(tablePanel, BorderLayout.CENTER);
 
-    reloadOverridedColumn(commonTable.getTable());
+    commonTable.reloadOverridedColumn(Arrays.asList("isCompleted"), Arrays.asList("id"));
 
     // メインパネルをタブに追加
     tabbedPane.addTab("Add Todo", mainPanel);
@@ -161,28 +152,6 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     }
   }
 
-  /** overrideしたカラムの読み込み */
-  private void reloadOverridedColumn(JTable table) {
-    commonTable.overrideColumnLabel();
-    int isCompletedColumnIndex = commonTable.getColumnIndexByName("isCompleted");
-
-    if (isCompletedColumnIndex != -1) {
-      TableColumn isCompletedColumn = table.getColumnModel().getColumn(isCompletedColumnIndex);
-
-      isCompletedColumn.setCellRenderer(new CheckBoxRenderer());
-      isCompletedColumn.setCellEditor(new CheckBoxEditor(new JCheckBox()));
-    }
-
-    int isIdColumn = commonTable.getColumnIndexByName("id");
-
-    if (isIdColumn != -1) {
-      commonTable.getTable().getColumnModel().getColumn(0).setMinWidth(0);
-      commonTable.getTable().getColumnModel().getColumn(0).setMaxWidth(0);
-      commonTable.getTable().getColumnModel().getColumn(0).setWidth(0);
-    }
-
-  }
-
   /** Editの切り替え */
   public void changeEdit() {
     isEditable = !isEditable;
@@ -191,8 +160,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     saveButton.setVisible(isEditable);
     deleteButton.setVisible(isEditable);
     reloadButton.setEnabled(!isEditable);
-    reloadOverridedColumn(commonTable.getTable());
-
+    commonTable.reloadOverridedColumn(Arrays.asList("isCompleted"), Arrays.asList("id"));
     commonTable.getTableModel().removeTableModelListener(tableModelListener);
     commonTable.getTableModel().addTableModelListener(tableModelListener);
   }
@@ -319,7 +287,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
   @Override
   public void onEditModeChanged(boolean isEditable) {
     this.isEditable = isEditable;
-    reloadOverridedColumn(commonTable.getTable());
+    commonTable.reloadOverridedColumn(Arrays.asList("isCompleted"), Arrays.asList("id"));
   }
 
 }

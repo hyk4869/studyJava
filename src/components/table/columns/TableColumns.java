@@ -9,43 +9,50 @@ import java.util.Map;
 public class TableColumns {
 
   /** カラム名（英語）と対応する日本語ラベル */
-  public final Map<String, String> TODO_LIST_COLUMN_LABELS = new LinkedHashMap<>();
+  public final Map<String, String> TODO_LIST_COLUMN_LABELS = new LinkedHashMap<>() {
+    {
+      put("id", "ID");
+      put("title", "タイトル");
+      put("description", "説明");
+      put("createdByName", "作成者");
+      put("updatedByName", "更新者");
+      put("createdAt", "作成日時");
+      put("updatedAt", "更新日時");
+      put("isCompleted", "完了");
+      put("sort", "並び順");
+    }
+  };
 
-  public TableColumns() {
-    TODO_LIST_COLUMN_LABELS.put("id", "ID");
-    TODO_LIST_COLUMN_LABELS.put("title", "タイトル");
-    TODO_LIST_COLUMN_LABELS.put("description", "説明");
-    TODO_LIST_COLUMN_LABELS.put("createdByName", "作成者");
-    TODO_LIST_COLUMN_LABELS.put("updatedByName", "更新者");
-    TODO_LIST_COLUMN_LABELS.put("createdAt", "作成日時");
-    TODO_LIST_COLUMN_LABELS.put("updatedAt", "更新日時");
-    TODO_LIST_COLUMN_LABELS.put("isCompleted", "完了");
-    TODO_LIST_COLUMN_LABELS.put("sort", "並び順");
-  }
+  // public final List<String> TODO_LIST_COLUMNS = Arrays.asList(
+  // "id", "title", "description", "createdByName",
+  // "updatedByName", "createdAt", "updatedAt", "isCompleted", "sort");
 
-  public final List<String> TODO_LIST_COLUMNS = Arrays.asList(
-      "id", "title", "description", "createdByName",
-      "updatedByName", "createdAt", "updatedAt", "isCompleted", "sort");
+  public final Map<String, String> TODO_LIST_COLUMNS = new LinkedHashMap<>() {
+    {
+      put("id", "String");
+      put("title", "String");
+      put("description", "String");
+      put("createdByName", "String");
+      put("updatedByName", "String");
+      put("createdAt", "Timestamp");
+      put("updatedAt", "Timestamp");
+      put("isCompleted", "Boolean");
+      put("sort", "Integer");
+    }
+  };
 
   /** 列名を除外するメソッド */
-  public List<String> omitColumns(List<String> columns, List<String> omitColumns) {
-    return columns.stream()
-        .filter(col -> !omitColumns.contains(col))
-        .collect(Collectors.toList());
+  public Map<String, String> omitColumns(Map<String, String> columns, List<String> omitColumns) {
+    return columns.entrySet().stream()
+        .filter(entry -> !omitColumns.contains(entry.getKey()))
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
   }
 
   /** 指定された列名だけをピックアップするメソッド */
-  public List<String> pickColumns(List<String> columns, List<String> pickColumns) {
-    return columns.stream()
-        .filter(pickColumns::contains)
-        .collect(Collectors.toList());
+  public Map<String, String> pickColumns(Map<String, String> columns, List<String> pickColumns) {
+    return columns.entrySet().stream()
+        .filter(entry -> pickColumns.contains(entry.getKey()))
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
   }
+
 }
-
-// List<String> omitColumns =
-// tableColumns.omitColumns(tableColumns.TODO_LIST_COLUMNS,
-// Arrays.asList("createdByName", "updatedByName"));
-
-// List<String> pickColumns =
-// tableColumns.pickColumns(tableColumns.TODO_LIST_COLUMNS,
-// Arrays.asList("id", "createdByName", "updatedByName"));

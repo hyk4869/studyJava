@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import src.components.enums.DefaultSortDateType;
@@ -23,11 +24,12 @@ public class CommonTable extends JTable {
   private DefaultTableModel tableModel;
   private boolean isEditable;
   private boolean checkBoxColumnAdded = false;
-  private List<String> columnNames;
+  // private List<String> columnNames;
+  private Map<String, String> columnNames;
   private Map<String, String> columnLabels;
 
-  public CommonTable(List<String> columnNames, boolean isEditable, Map<String, String> columnLabels) {
-    super(new DefaultTableModel(columnNames.toArray(), 0));
+  public CommonTable(Map<String, String> columnNames, boolean isEditable, Map<String, String> columnLabels) {
+    super(new DefaultTableModel(columnNames.keySet().toArray(), 0));
     this.columnNames = columnNames;
     this.columnLabels = columnLabels;
 
@@ -39,8 +41,9 @@ public class CommonTable extends JTable {
 
   /** テーブルのカラムを日本語対応できるように */
   public void overrideColumnLabel() {
-    for (int i = 0; i < columnNames.size(); i++) {
-      String englishColumnName = columnNames.get(i);
+    List<String> columnKeys = new ArrayList<>(columnNames.keySet());
+    for (int i = 0; i < columnKeys.size(); i++) {
+      String englishColumnName = columnKeys.get(i);
       String japaneseLabel = columnLabels.getOrDefault(englishColumnName, englishColumnName);
       getColumnModel().getColumn(i).setHeaderValue(japaneseLabel);
     }
@@ -222,5 +225,44 @@ public class CommonTable extends JTable {
       }
     }
     return rowData;
+  }
+
+  /**
+   * カラムの上書きとoverrideしたカラムの読み込み
+   *
+   * @param columnList ここで上書きしたいものを選択
+   * @param hiddenList 非表示にしたいものを選択
+   */
+  public void reloadOverridedColumn(List<String> columnList, List<String> hiddenList) {
+    overrideColumnLabel();
+
+    for (String columnName : columnList) {
+      int columnIndex = getColumnIndexByName(columnName);
+
+      if (columnIndex != 1 && this.columnNames.containsKey(columnName)) {
+        String type = this.columnNames.get(columnName);
+
+        // 必要に応じてここで独自のコンポーネントを呼ぶ
+        if (type.equals("Boolean")) {
+          TableColumn checkBoxColumn = getColumnModel().getColumn(columnIndex);
+          checkBoxColumn.setCellRenderer(new CheckBoxRenderer());
+          checkBoxColumn.setCellEditor(new CheckBoxEditor(new JCheckBox()));
+
+        }
+
+      }
+    }
+
+    for (String hiddenName : hiddenList) {
+      int columnIndex = getColumnIndexByName(hiddenName);
+
+      if (columnIndex != -1) {
+        TableColumn column = getTable().getColumnModel().getColumn(columnIndex);
+
+        column.setMinWidth(0);
+        column.setMaxWidth(0);
+        column.setWidth(0);
+      }
+    }
   }
 }
