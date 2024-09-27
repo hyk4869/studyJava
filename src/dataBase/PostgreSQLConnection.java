@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 public class PostgreSQLConnection {
   private Connection connection;
@@ -46,8 +47,10 @@ public class PostgreSQLConnection {
     return preparedStatement;
   }
 
-  /** PreparedStatement にパラメータをセットするヘルパーメソッド */
+  /** PreparedStatement にパラメータをセット */
   private void setParameters(PreparedStatement preparedStatement, Object... params) throws SQLException {
+    System.out.println(preparedStatement.toString());
+    System.out.println(Arrays.toString(params));
     for (int i = 0; i < params.length; i++) {
       Object value = params[i];
       if (value instanceof java.sql.Timestamp) {
@@ -56,6 +59,8 @@ public class PostgreSQLConnection {
         preparedStatement.setDate(i + 1, (java.sql.Date) value);
       } else if (value instanceof Boolean) {
         preparedStatement.setBoolean(i + 1, (Boolean) value);
+      } else if (value instanceof Integer) {
+        preparedStatement.setInt(i + 1, (Integer) value);
       } else {
         preparedStatement.setObject(i + 1, value); // インデックスは1から始まる
       }

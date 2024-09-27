@@ -33,11 +33,11 @@ public class SearchTodoPannelQuery {
       Object value = searchParams.get(key);
 
       // 型に応じてクエリを変更
-      if (value instanceof Boolean) {
+      if (value instanceof Boolean || value instanceof Integer) {
         queryBuilder.append("\"").append(key).append("\" = ?");
       } else if (value instanceof java.sql.Timestamp) {
         queryBuilder.append("DATE(\"").append(key).append("\") = ?");
-      } else {
+      } else if (value instanceof String) {
         queryBuilder.append("\"").append(key).append("\" ILIKE ?");
       }
 
