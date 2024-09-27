@@ -25,15 +25,10 @@ public class CommonTable extends JTable {
   private DefaultTableModel tableModel;
   private boolean isEditable;
   private boolean checkBoxColumnAdded = false;
-  // private Map<String, String> columnNames;
-  // private Map<String, String> columnLabels;
   private ColumnsName columnsName;
 
   public CommonTable(boolean isEditable, Map<String, String> columnNames, Map<String, String> columnLabels) {
     super(new DefaultTableModel(columnNames.keySet().toArray(), 0));
-    // this.columnNames = columnNames;
-    // this.columnLabels = columnLabels;
-
     columnsName = new ColumnsName(this, columnNames, columnLabels);
 
     this.tableModel = (DefaultTableModel) this.getModel();
@@ -41,19 +36,6 @@ public class CommonTable extends JTable {
     this.setRowSorter(new TableRowSorter<>(tableModel));
     this.setRowHeight(30);
   }
-
-  // /**
-  // * テーブルのカラムを日本語対応できるように
-  // */
-  // public void overrideColumnLabel() {
-  // List<String> columnKeys = new ArrayList<>(columnNames.keySet());
-  // for (int i = 0; i < columnKeys.size(); i++) {
-  // String englishColumnName = columnKeys.get(i);
-  // String japaneseLabel = columnLabels.getOrDefault(englishColumnName,
-  // englishColumnName);
-  // getColumnModel().getColumn(i).setHeaderValue(japaneseLabel);
-  // }
-  // }
 
   /**
    * テーブルモデルを取得
