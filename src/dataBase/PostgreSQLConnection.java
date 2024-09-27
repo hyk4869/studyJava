@@ -49,7 +49,6 @@ public class PostgreSQLConnection {
 
   /** PreparedStatement にパラメータをセット */
   private void setParameters(PreparedStatement preparedStatement, Object... params) throws SQLException {
-    System.out.println("★★★★★★★★★★★★★★★★★★★");
     System.out.println(preparedStatement.toString());
     System.out.println(Arrays.toString(params));
     System.out.println("★★★★★★★★★★★★★★★★★★★");

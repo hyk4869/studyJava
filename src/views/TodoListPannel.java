@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -212,24 +213,29 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
       for (Integer rowIndex : validModifiedRows) {
         int modelRowIndex = commonTable.convertRowIndexToModel(rowIndex);
 
+        Map<String, Object> updatedValues = new HashMap<>();
         String id = (String) commonTable.getTableModel().getValueAt(modelRowIndex,
             commonTable.getColumnIndexByName("id"));
-        String title = (String) commonTable.getTableModel().getValueAt(modelRowIndex,
-            commonTable.getColumnIndexByName("title"));
-        String description = (String) commonTable.getTableModel().getValueAt(modelRowIndex,
-            commonTable.getColumnIndexByName("description"));
-        Boolean isCompleted = (Boolean) commonTable.getTableModel().getValueAt(modelRowIndex,
-            commonTable.getColumnIndexByName("isCompleted"));
-        Integer sort = (Integer) commonTable.getTableModel().getValueAt(modelRowIndex,
-            commonTable.getColumnIndexByName("sort"));
+
+        // 更新するカラムと値を動的にMapに追加
+        updatedValues.put("id", id);
+        updatedValues.put("title", commonTable.getTableModel().getValueAt(modelRowIndex,
+            commonTable.getColumnIndexByName("title")));
+        updatedValues.put("description", commonTable.getTableModel().getValueAt(modelRowIndex,
+            commonTable.getColumnIndexByName("description")));
+        updatedValues.put("isCompleted", commonTable.getTableModel().getValueAt(modelRowIndex,
+            commonTable.getColumnIndexByName("isCompleted")));
+        updatedValues.put("sort", commonTable.getTableModel().getValueAt(modelRowIndex,
+            commonTable.getColumnIndexByName("sort")));
 
         // タイトルの重複チェック
-        if (todoQuery.isTitleDuplicated(title, id)) {
-          throw new SQLException("Error: Title '" + title + "' is duplicated. Row " + rowIndex + " cannot be saved.");
+        if (todoQuery.isTitleDuplicated((String) updatedValues.get("title"), id)) {
+          throw new SQLException(
+              "Error: Title '" + updatedValues.get("title") + "' is duplicated. Row " + rowIndex + " cannot be saved.");
         }
 
-        // タイトルが重複していない場合のみ更新
-        todoQuery.updateTodoItem(id, title, description, isCompleted, sort);
+        // 更新処理を呼び出し
+        todoQuery.updateTodoItem(updatedValues);
       }
 
       commonTable.loadAllTodoItems(todoQuery.getAllTodoItems());
@@ -252,27 +258,32 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
   /** DBに追加 */
   @Override
   public void actionPerformed(ActionEvent e) {
-    String title = (String) commonTab.getFieldValue("title");
-    String description = (String) commonTab.getFieldValue("description");
-    Boolean isCompleted = (Boolean) commonTab.getFieldValue("isCompleted");
+    Map<String, Object> newTodoItem = new HashMap<>();
 
-    // idやその他の必要なフィールドを生成
-    String id = java.util.UUID.randomUUID().toString(); // 一意のIDを生成
-    String createdById = "ce3b1d98-2ed8-4a02-a5c3-9e8f9e5c20f7"; // 実際のユーザーIDを設定
-    String updatedById = createdById;
-    String createdByName = "CreatedUser"; // 実際のユーザー名
-    String updatedByName = createdByName;
-    Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+    Object title = commonTab.getFieldValue("title");
+    Object description = commonTab.getFieldValue("description");
+    Object isCompleted = commonTab.getFieldValue("isCompleted");
+
+    newTodoItem.put("id", java.util.UUID.randomUUID().toString());
+    newTodoItem.put("createdById", "ce3b1d98-2ed8-4a02-a5c3-9e8f9e5c20f7");
+    newTodoItem.put("updatedById", "ce3b1d98-2ed8-4a02-a5c3-9e8f9e5c20f7");
+    newTodoItem.put("createdByName", "CreatedUser");
+    newTodoItem.put("updatedByName", "CreatedUser");
+    newTodoItem.put("createdAt", new Timestamp(System.currentTimeMillis()));
+    newTodoItem.put("updatedAt", new Timestamp(System.currentTimeMillis()));
+    newTodoItem.put("title", title);
+    newTodoItem.put("description", description);
+    newTodoItem.put("isCompleted", isCompleted);
+    newTodoItem.put("sort", 0);
 
     try {
       // タイトルの重複チェック
-      if (todoQuery.isTitleDuplicated(title, id)) {
+      if (todoQuery.isTitleDuplicated((String) title, (String) newTodoItem.get("id"))) {
         throw new SQLException("Error: Title '" + title + "' is duplicated. Insertion aborted.");
       }
 
-      // タイトルが重複していない場合のみ挿入
-      todoQuery.insertTodoItem(id, createdById, createdByName, updatedById, updatedByName, currentTimestamp,
-          currentTimestamp, title, description, isCompleted);
+      // Todo項目を挿入
+      todoQuery.insertTodoItem(newTodoItem);
 
       commonTable.loadAllTodoItems(todoQuery.getAllTodoItems());
 

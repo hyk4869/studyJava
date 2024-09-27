@@ -3,6 +3,10 @@ package src.dataBase.query;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import src.dataBase.PostgreSQLConnection;
 
 public class TodoListPannelQuery {
@@ -37,27 +41,58 @@ public class TodoListPannelQuery {
   }
 
   /** Todo項目を追加するクエリ */
-  public void insertTodoItem(String id, String createdById, String createdByName, String updatedById,
-      String updatedByName, Timestamp createdAt, Timestamp updatedAt, String title, String description,
-      Boolean isCompleted)
-      throws SQLException {
-    String query = "INSERT INTO \"T_TodoList\" (" + getInsertColumns() + ") " +
-        "VALUES (" + getInsertValuesPlaceholders() + ")";
-    connection.executeUpdate(query, createdById, updatedById, id, title, description, createdByName, updatedByName,
-        createdAt, updatedAt, isCompleted, 0);
+  public void insertTodoItem(Map<String, Object> todoItemData) throws SQLException {
+    // カラム名とプレースホルダーを動的に生成
+    StringBuilder columns = new StringBuilder();
+    StringBuilder placeholders = new StringBuilder();
+
+    todoItemData.forEach((key, value) -> {
+      columns.append("\"").append(key).append("\", ");
+      placeholders.append("?, ");
+    });
+
+    // カラム名とプレースホルダーの末尾の余分な「, 」を削除
+    if (columns.length() > 0) {
+      columns.setLength(columns.length() - 2);
+      placeholders.setLength(placeholders.length() - 2);
+    }
+
+    String query = "INSERT INTO \"T_TodoList\" (" + columns.toString() + ") " +
+        "VALUES (" + placeholders.toString() + ")";
+
+    connection.executeUpdate(query, todoItemData.values().toArray());
   }
 
   /** Todo項目を更新するクエリ */
-  public void updateTodoItem(String id, String title, String description, Boolean isCompleted, Integer sort)
-      throws SQLException {
-    String query = "UPDATE \"T_TodoList\" " +
-        "SET \"title\" = ?, \"description\" = ?, \"isCompleted\" = ?, \"sort\" = ?, \"updatedAt\" = ? " +
-        "WHERE \"id\" = ? AND \"deletedAt\" IS NULL";
+  public void updateTodoItem(Map<String, Object> updatedValues) throws SQLException {
+    StringBuilder setClause = new StringBuilder();
+    List<Object> params = new ArrayList<>();
 
+    // 更新するカラムと値を動的に生成
+    updatedValues.forEach((key, value) -> {
+      if (!key.equals("id")) { // ID は WHERE 句に使用するため SET 句には含めない
+        setClause.append("\"").append(key).append("\" = ?, ");
+        params.add(value);
+      }
+    });
+
+    // 最後のカンマとスペースを削除
+    if (setClause.length() > 0) {
+      setClause.setLength(setClause.length() - 2);
+    }
+
+    String query = "UPDATE \"T_TodoList\" SET " + setClause.toString()
+        + ", \"updatedAt\" = ? WHERE \"id\" = ? AND \"deletedAt\" IS NULL";
+
+    // 更新日時を追加
     Timestamp updatedAt = new Timestamp(System.currentTimeMillis());
+    params.add(updatedAt);
 
-    connection.executeUpdate(query, title, description, isCompleted, sort, updatedAt, id);
+    // ID は WHERE 句に使用するので最後に追加
+    params.add(updatedValues.get("id"));
 
+    // クエリ実行
+    connection.executeUpdate(query, params.toArray());
   }
 
   /** Todo項目を取得するクエリ */
