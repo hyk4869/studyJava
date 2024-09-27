@@ -15,7 +15,6 @@ import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Timestamp;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +28,7 @@ import src.components.parts.CustomDateField;
 import src.components.parts.CustomNumericField;
 import src.components.parts.CustomTextArea;
 import src.components.parts.CustomTextField;
+import src.components.parts.interfaces.FormattedField;
 import src.tab.pannels.CreatePannel;
 import src.utils.CommonFont;
 
@@ -130,34 +130,14 @@ public class CommonTab {
   public Object getFieldValue(String fieldName) {
     Object field = fieldMap.get(fieldName);
 
-    if (field instanceof JTextField) {
+    if (field instanceof FormattedField<?>) {
+      return ((FormattedField<?>) field).getFormattedValue();
+    } else if (field instanceof JTextField) {
       return ((JTextField) field).getText();
     } else if (field instanceof CustomCheckBox) {
       return ((CustomCheckBox) field).isChecked();
     } else if (field instanceof JTextArea) {
       return ((JTextArea) field).getText();
-    } else if (field instanceof CustomNumericField) {
-      String text = ((CustomNumericField) field).getText();
-      try {
-        if (text != null && !text.isEmpty()) {
-          return Integer.parseInt(text);
-        }
-      } catch (NumberFormatException e) {
-        System.out.println("Invalid number format: " + text);
-        return null;
-      }
-    } else if (field instanceof CustomDateField) {
-      String text = ((CustomDateField) field).getText();
-      if (text != null && !text.isEmpty()) {
-        try {
-          SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-          java.util.Date parsedDate = dateFormat.parse(text);
-          return new Timestamp(parsedDate.getTime());
-        } catch (ParseException e) {
-          System.out.println("Invalid date format: " + text);
-          return null;
-        }
-      }
     }
 
     return null;
@@ -167,24 +147,23 @@ public class CommonTab {
   public void setFieldValue(String fieldName, Object value) {
     Object field = fieldMap.get(fieldName);
 
-    if (field instanceof JTextField) {
+    // フィールドが FormattedField を実装している場合、型に応じた設定を行う
+    if (field instanceof FormattedField<?>) {
+      // FormattedField の場合、キャストして適切な型の値を設定する
+      if (field instanceof CustomNumericField && value instanceof Integer) {
+        ((CustomNumericField) field).setText(String.valueOf(value));
+      } else if (field instanceof CustomDateField && value instanceof Timestamp) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        ((CustomDateField) field).setText(dateFormat.format((Timestamp) value));
+      } else if (field instanceof CustomDateField && value instanceof String) {
+        ((CustomDateField) field).setText((String) value);
+      }
+    } else if (field instanceof JTextField) {
       ((JTextField) field).setText((String) value);
     } else if (field instanceof CustomCheckBox) {
       ((CustomCheckBox) field).setChecked((Boolean) value);
     } else if (field instanceof JTextArea) {
       ((JTextArea) field).setText((String) value);
-    } else if (field instanceof CustomNumericField) {
-      if (value instanceof Integer) {
-        ((CustomNumericField) field).setText(String.valueOf(value));
-      }
-    } else if (field instanceof CustomDateField) {
-      if (value instanceof Timestamp) {
-        Timestamp timestamp = (Timestamp) value;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        ((CustomDateField) field).setText(dateFormat.format(timestamp));
-      } else if (value instanceof String) {
-        ((CustomDateField) field).setText((String) value);
-      }
     }
   }
 

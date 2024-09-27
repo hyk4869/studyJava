@@ -9,8 +9,6 @@ import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,61 +87,50 @@ public class SearchTodoPannel {
   public void getContent() {
     Map<String, Object> searchParams = new HashMap<>();
 
-    String title = (String) commonTab.getFieldValue("title");
-    String description = (String) commonTab.getFieldValue("description");
-    String createdByName = (String) commonTab.getFieldValue("createdByName");
-    String updatedByName = (String) commonTab.getFieldValue("updatedByName");
-    Timestamp createdAt = parseTimestamp((String) commonTab.getFieldValue("createdAt"));
-    Timestamp updatedAt = parseTimestamp((String) commonTab.getFieldValue("updatedAt"));
-    Timestamp deletedAt = parseTimestamp((String) commonTab.getFieldValue("deletedAt"));
-    Boolean isCompleted = (Boolean) commonTab.getFieldValue("isCompleted");
-    // Integer sort = (Integer) commonTab.getFieldValue("sort");
+    Object title = commonTab.getFieldValue("title");
+    Object description = commonTab.getFieldValue("description");
+    Object createdByName = commonTab.getFieldValue("createdByName");
+    Object updatedByName = commonTab.getFieldValue("updatedByName");
+    Object createdAt = commonTab.getFieldValue("createdAt");
+    Object updatedAt = commonTab.getFieldValue("updatedAt");
+    Object deletedAt = commonTab.getFieldValue("deletedAt");
+    Object isCompleted = commonTab.getFieldValue("isCompleted");
     Object sortValue = commonTab.getFieldValue("sort");
-    Integer sort = null;
-    if (sortValue != null && sortValue instanceof Integer) {
-      sort = (Integer) sortValue;
+
+    // 条件に応じて検索パラメータを追加
+    if (title instanceof String && !((String) title).isEmpty()) {
+      searchParams.put("title", title);
+    }
+    if (description instanceof String && !((String) description).isEmpty()) {
+      searchParams.put("description", description);
+    }
+    if (createdByName instanceof String && !((String) createdByName).isEmpty()) {
+      searchParams.put("createdByName", createdByName);
+    }
+    if (updatedByName instanceof String && !((String) updatedByName).isEmpty()) {
+      searchParams.put("updatedByName", updatedByName);
+    }
+    if (createdAt instanceof Timestamp) {
+      searchParams.put("createdAt", createdAt);
+    }
+    if (updatedAt instanceof Timestamp) {
+      searchParams.put("updatedAt", updatedAt);
+    }
+    if (deletedAt instanceof Timestamp) {
+      searchParams.put("deletedAt", deletedAt);
+    }
+    if (isCompleted instanceof Boolean) {
+      searchParams.put("isCompleted", isCompleted);
+    }
+    if (sortValue instanceof Integer) {
+      searchParams.put("sort", sortValue);
     }
 
-    if (title != null && !title.isEmpty())
-      searchParams.put("title", title);
-    if (description != null && !description.isEmpty())
-      searchParams.put("description", description);
-    if (createdByName != null && !createdByName.isEmpty())
-      searchParams.put("createdByName", createdByName);
-    if (updatedByName != null && !updatedByName.isEmpty())
-      searchParams.put("updatedByName", updatedByName);
-    if (createdAt != null)
-      searchParams.put("createdAt", createdAt);
-    if (updatedAt != null)
-      searchParams.put("updatedAt", updatedAt);
-    if (deletedAt != null)
-      searchParams.put("deletedAt", deletedAt);
-    if (isCompleted != null)
-      searchParams.put("isCompleted", isCompleted);
-    if (sort != null)
-      searchParams.put("sort", sort);
-
     try {
-      System.out.println(searchParams);
       ResultSet rs = searchTodoQuery.searchTodoList(searchParams);
       commonTable.loadAllTodoItems(rs);
     } catch (SQLException e) {
       e.printStackTrace();
-    }
-  }
-
-  private Timestamp parseTimestamp(String dateString) {
-    if (dateString == null || dateString.trim().isEmpty()) {
-      return null;
-    }
-
-    try {
-      SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-      java.util.Date parsedDate = dateFormat.parse(dateString);
-      return new Timestamp(parsedDate.getTime());
-    } catch (ParseException e) {
-      e.printStackTrace();
-      return null;
     }
   }
 
