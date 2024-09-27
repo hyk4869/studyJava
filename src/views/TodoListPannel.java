@@ -161,11 +161,12 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
   /** Editの切り替え */
   public void changeEdit() {
     isEditable = !isEditable;
-    commonTable.setEditable(isEditable);
     editButton.setText(isEditable ? "Cancel" : "Edit");
     saveButton.setVisible(isEditable);
     deleteButton.setVisible(isEditable);
     reloadButton.setEnabled(!isEditable);
+
+    commonTable.setEditable(isEditable);
     commonTable.reloadOverridedColumn(Arrays.asList("isCompleted"), Arrays.asList("id"));
     commonTable.getTableModel().removeTableModelListener(tableModelListener);
     commonTable.getTableModel().addTableModelListener(tableModelListener);
@@ -187,6 +188,8 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
         rollbackEx.printStackTrace();
       }
       ex.printStackTrace();
+    } finally {
+      changeEdit();
     }
   }
 
