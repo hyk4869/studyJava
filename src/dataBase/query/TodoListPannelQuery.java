@@ -84,14 +84,12 @@ public class TodoListPannelQuery {
     String query = "UPDATE \"T_TodoList\" SET " + setClause.toString()
         + ", \"updatedAt\" = ? WHERE \"id\" = ? AND \"deletedAt\" IS NULL";
 
-    // 更新日時を追加
     Timestamp updatedAt = new Timestamp(System.currentTimeMillis());
     params.add(updatedAt);
 
     // ID は WHERE 句に使用するので最後に追加
     params.add(updatedValues.get("id"));
 
-    // クエリ実行
     connection.executeUpdate(query, params.toArray());
   }
 

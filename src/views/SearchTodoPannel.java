@@ -54,7 +54,7 @@ public class SearchTodoPannel {
 
     commonTab = new CommonTab();
 
-    commonTable = new CommonTable(tableColumns.TODO_LIST_COLUMNS, false, tableColumns.TODO_LIST_COLUMN_LABELS);
+    commonTable = new CommonTable(false, tableColumns.TODO_LIST_COLUMNS, tableColumns.TODO_LIST_COLUMN_LABELS);
 
     /** メインパネルの作成 */
     JPanel mainPanel = new JPanel(new BorderLayout());

@@ -36,7 +36,7 @@ import src.utils.CommonColor;
 public class TodoListPannel implements ActionListener, FooterButtonsInterface {
 
   private CommonTable commonTable;
-  private CommonTab commonTab;
+  private CommonTab commonTab = new CommonTab();
   private PostgreSQLConnection connection;
   private TodoListPannelQuery todoQuery;
   /** テーブルの編集 */
@@ -47,6 +47,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
   private CustomButton addTodoButton = new CustomButton();
   private FieldLabel fieldLabel = new FieldLabel();
   public FooterButtons footerButtons = new FooterButtons();
+  private GridBagConstraints gbc = new GridBagConstraints();
 
   public CustomButton saveButton;
   public CustomButton reloadButton;
@@ -72,8 +73,6 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
   /** mainメソッドにTodoListタブとその中身を生成 */
   public void GenerateTodoListTab(JTabbedPane tabbedPane) {
 
-    commonTab = new CommonTab();
-
     // innerPanelの作成
     JPanel innerPanel = commonTab.createInnerPanel("Add Your Todo", fieldLabel.TODO_FIELD_CONFIGS,
         fieldLabel.TODO_FIELD_LABELS,
@@ -82,7 +81,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     Map<String, String> newTodoListColumn = tableColumns.pickColumns(tableColumns.TODO_LIST_COLUMNS,
         Arrays.asList("id", "title", "description", "isCompleted", "sort", "updatedAt"));
 
-    commonTable = new CommonTable(newTodoListColumn, isEditable, tableColumns.TODO_LIST_COLUMN_LABELS);
+    commonTable = new CommonTable(isEditable, newTodoListColumn, tableColumns.TODO_LIST_COLUMN_LABELS);
 
     commonTable.getTableModel().addTableModelListener(tableModelListener);
 
@@ -95,9 +94,6 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     /** ボタンのパネル作成 */
     JPanel buttonPanel = new JPanel();
 
-    // FooterButtons footerButtons = new FooterButtons();
-
-    GridBagConstraints gbc = new GridBagConstraints();
     gbc.gridx = 0;
     gbc.gridy = 3;
     gbc.gridwidth = 2;
