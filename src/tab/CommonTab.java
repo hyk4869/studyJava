@@ -2,7 +2,6 @@ package src.tab;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 import javax.swing.JFrame;
@@ -15,6 +14,9 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -124,74 +126,6 @@ public class CommonTab {
     }
   }
 
-  /** オーバーロードしたもの TODO:要らないからあとで削除 */
-  private void addFields(JPanel innerPanel, Map<String, String> fieldConfigs,
-      TextFieldStyle style, int columns) {
-    GridBagConstraints innerGbc = new GridBagConstraints();
-    innerGbc.insets = new Insets(10, 10, 10, 10);
-
-    int index = 0;
-    for (Map.Entry<String, String> entry : fieldConfigs.entrySet()) {
-      String labelText = entry.getKey();
-      String fieldType = entry.getValue();
-
-      CustomLabeledComponent labeledComponent;
-      Object field = null;
-
-      // フィールドタイプに応じてコンポーネントを選択
-      if ("numeric".equalsIgnoreCase(fieldType)) {
-        CustomNumericField numericField = new CustomNumericField(20, style, 14);
-        labeledComponent = new CustomLabeledComponent(labelText, numericField);
-        field = numericField;
-
-      } else if ("date".equalsIgnoreCase(fieldType)) {
-        CustomDateField dateField = new CustomDateField(20, style, 14);
-        labeledComponent = new CustomLabeledComponent(labelText, dateField);
-        field = dateField;
-
-      } else if ("check".equalsIgnoreCase(fieldType)) {
-        CustomCheckBox checkBox = new CustomCheckBox("isCompleted");
-        labeledComponent = new CustomLabeledComponent(labelText, checkBox);
-        field = checkBox;
-
-      } else if ("textArea".equalsIgnoreCase(fieldType)) {
-        CustomTextArea customTextArea = new CustomTextArea(5, 20, style, 14);
-
-        customTextArea.setLineWrap(true);
-        customTextArea.setWrapStyleWord(true);
-
-        JScrollPane scrollPane = new JScrollPane(customTextArea);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-
-        // 固定サイズを指定せずに、行数・列数に基づく
-        customTextArea.setPreferredSize(null);
-
-        labeledComponent = new CustomLabeledComponent(labelText, scrollPane);
-        field = customTextArea;
-
-      } else {
-        CustomTextField textFieldStandard = new CustomTextField(20, style, 14);
-        labeledComponent = new CustomLabeledComponent(labelText, textFieldStandard);
-        field = textFieldStandard;
-
-      }
-
-      innerGbc.gridx = index % columns; // 指定された列数に基づいて配置
-      innerGbc.gridy = index / columns; // 行
-      innerGbc.fill = GridBagConstraints.HORIZONTAL; // 横方向に広げる
-      innerGbc.weightx = 1.0; // 余分なスペースがあれば均等に配分
-      innerGbc.anchor = GridBagConstraints.WEST; // 左寄せ
-      innerPanel.add(labeledComponent, innerGbc);
-
-      components.add(labeledComponent);
-
-      fieldMap.put(labelText, field);
-
-      index++;
-    }
-  }
-
   /** フィールドの値を取得する */
   public Object getFieldValue(String fieldName) {
     Object field = fieldMap.get(fieldName);
@@ -202,6 +136,28 @@ public class CommonTab {
       return ((CustomCheckBox) field).isChecked();
     } else if (field instanceof JTextArea) {
       return ((JTextArea) field).getText();
+    } else if (field instanceof CustomNumericField) {
+      String text = ((CustomNumericField) field).getText();
+      try {
+        if (text != null && !text.isEmpty()) {
+          return Integer.parseInt(text);
+        }
+      } catch (NumberFormatException e) {
+        System.out.println("Invalid number format: " + text);
+        return null;
+      }
+    } else if (field instanceof CustomDateField) {
+      String text = ((CustomDateField) field).getText();
+      if (text != null && !text.isEmpty()) {
+        try {
+          SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+          java.util.Date parsedDate = dateFormat.parse(text);
+          return new Timestamp(parsedDate.getTime());
+        } catch (ParseException e) {
+          System.out.println("Invalid date format: " + text);
+          return null;
+        }
+      }
     }
 
     return null;
@@ -217,55 +173,19 @@ public class CommonTab {
       ((CustomCheckBox) field).setChecked((Boolean) value);
     } else if (field instanceof JTextArea) {
       ((JTextArea) field).setText((String) value);
+    } else if (field instanceof CustomNumericField) {
+      if (value instanceof Integer) {
+        ((CustomNumericField) field).setText(String.valueOf(value));
+      }
+    } else if (field instanceof CustomDateField) {
+      if (value instanceof Timestamp) {
+        Timestamp timestamp = (Timestamp) value;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        ((CustomDateField) field).setText(dateFormat.format(timestamp));
+      } else if (value instanceof String) {
+        ((CustomDateField) field).setText((String) value);
+      }
     }
-  }
-
-  /** 内部パネルをメインパネルに追加 */
-  private void addInnerPanelToMain(JPanel mainPanel, JPanel innerPanel, int position) {
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.gridx = 0;
-    gbc.gridy = position; // 位置を指定する
-    gbc.gridwidth = GridBagConstraints.REMAINDER; // パネルの幅全体を使う
-    gbc.insets = new Insets(0, 10, 0, 10); // 左右のマージンを10に設定
-    gbc.fill = GridBagConstraints.HORIZONTAL; // 横方向に広げる
-    gbc.weightx = 1.0; // 横方向に余分なスペースを与え、均等に広げる
-    gbc.weighty = 0.0; // 縦方向のスペースを余分に与えない
-    gbc.anchor = GridBagConstraints.NORTH; // 上に配置
-
-    mainPanel.add(innerPanel, gbc);
-
-    // メインパネルが上詰めになるように設定
-    GridBagConstraints fillerGbc = new GridBagConstraints();
-    fillerGbc.gridx = 0;
-    fillerGbc.gridy = position + 1; // 次の行にスペースを追加
-    fillerGbc.weightx = 1.0;
-    fillerGbc.weighty = 1.0; // 縦方向に余分なスペースを与える
-    fillerGbc.fill = GridBagConstraints.BOTH; // 余白を埋める
-    mainPanel.add(new JPanel(), fillerGbc); // 余分なスペースを埋めるためのダミーパネルを追加
-  }
-
-  /**
-   * タブ追加メソッド
-   *
-   * @param tabbedPane
-   * @param title
-   * @param fieldConfigs
-   * @param style
-   * @param columns
-   *                     テキストフィールドを配置する列数
-   * @return innerPanelを返すことで、外部からボタンを追加できるようにする
-   */
-  public JPanel addTab(JTabbedPane tabbedPane, String title, Map<String, String> fieldConfigs, TextFieldStyle style,
-      int columns, int position) {
-    JPanel mainPanel = createPannel.createMainPanel();
-    JPanel innerPanel = createPannel.createInnerPanel(title);
-
-    addFields(innerPanel, fieldConfigs, style, columns);
-    addInnerPanelToMain(mainPanel, innerPanel, position);
-
-    tabbedPane.addTab(title, mainPanel);
-
-    return innerPanel;
   }
 
   public static void addFocusListener(JFrame frame, List<JTextField> textFields) {

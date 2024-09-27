@@ -23,25 +23,42 @@ public class PostgreSQLConnection {
     }
   }
 
+  public Connection getConnection() {
+    return connection;
+  }
+
   /** SELECT文をPreparedStatementで実行 */
   public ResultSet executeQuery(String query, Object... params) throws SQLException {
-    PreparedStatement preparedStatement = connection.prepareStatement(query);
-    setParameters(preparedStatement, params);
+    PreparedStatement preparedStatement = prepareStatement(query, params);
     return preparedStatement.executeQuery();
   }
 
   /** INSERT, UPDATE, DELETE 文をPreparedStatementで実行 */
   public int executeUpdate(String query, Object... params) throws SQLException {
+    PreparedStatement preparedStatement = prepareStatement(query, params);
+    return preparedStatement.executeUpdate();
+  }
+
+  /** 共通のPreparedStatement作成メソッド */
+  public PreparedStatement prepareStatement(String query, Object... params) throws SQLException {
     PreparedStatement preparedStatement = connection.prepareStatement(query);
     setParameters(preparedStatement, params);
-    int result = preparedStatement.executeUpdate();
-    return result;
+    return preparedStatement;
   }
 
   /** PreparedStatement にパラメータをセットするヘルパーメソッド */
   private void setParameters(PreparedStatement preparedStatement, Object... params) throws SQLException {
     for (int i = 0; i < params.length; i++) {
-      preparedStatement.setObject(i + 1, params[i]); // インデックスは1から始まる
+      Object value = params[i];
+      if (value instanceof java.sql.Timestamp) {
+        preparedStatement.setTimestamp(i + 1, (java.sql.Timestamp) value);
+      } else if (value instanceof java.sql.Date) {
+        preparedStatement.setDate(i + 1, (java.sql.Date) value);
+      } else if (value instanceof Boolean) {
+        preparedStatement.setBoolean(i + 1, (Boolean) value);
+      } else {
+        preparedStatement.setObject(i + 1, value); // インデックスは1から始まる
+      }
     }
   }
 
