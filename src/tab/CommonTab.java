@@ -1,11 +1,9 @@
 package src.tab;
 
-import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
 import javax.swing.JFrame;
-import javax.swing.JScrollPane;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.plaf.InsetsUIResource;
@@ -26,9 +24,8 @@ import src.components.labels.CustomLabeledComponent;
 import src.components.parts.CustomCheckBox;
 import src.components.parts.CustomDateField;
 import src.components.parts.CustomNumericField;
-import src.components.parts.CustomTextArea;
-import src.components.parts.CustomTextField;
 import src.components.parts.interfaces.FormattedField;
+import src.tab.inputFields.GenerateInputFields;
 import src.tab.pannels.CreatePannel;
 import src.utils.CommonFont;
 
@@ -59,10 +56,15 @@ public class CommonTab {
   /** 指定した各テキストフィールドの追加 */
   private void addFields(JPanel innerPanel, Map<String, String> fieldConfigs, Map<String, String> customLabel,
       TextFieldStyle style, int columns) {
+
     GridBagConstraints innerGbc = new GridBagConstraints();
+
     innerGbc.insets = new Insets(10, 10, 10, 10);
 
+    GenerateInputFields generateInputFields = new GenerateInputFields();
+
     int index = 0;
+
     for (Map.Entry<String, String> entry : fieldConfigs.entrySet()) {
       String labelText = entry.getKey();
       String fieldType = entry.getValue();
@@ -72,44 +74,9 @@ public class CommonTab {
       CustomLabeledComponent labeledComponent;
       Object field = null;
 
-      // フィールドタイプに応じてコンポーネントを選択
-      if ("numeric".equalsIgnoreCase(fieldType)) {
-        CustomNumericField numericField = new CustomNumericField(20, style, 14);
-        labeledComponent = new CustomLabeledComponent(japaneseLabel, numericField);
-        field = numericField;
-
-      } else if ("date".equalsIgnoreCase(fieldType)) {
-        CustomDateField dateField = new CustomDateField(20, style, 14);
-        labeledComponent = new CustomLabeledComponent(japaneseLabel, dateField);
-        field = dateField;
-
-      } else if ("check".equalsIgnoreCase(fieldType)) {
-        CustomCheckBox checkBox = new CustomCheckBox("isCompleted");
-        labeledComponent = new CustomLabeledComponent(japaneseLabel, checkBox);
-        field = checkBox;
-
-      } else if ("textArea".equalsIgnoreCase(fieldType)) {
-        CustomTextArea customTextArea = new CustomTextArea(5, 20, style, 14);
-
-        customTextArea.setLineWrap(true);
-        customTextArea.setWrapStyleWord(true);
-
-        JScrollPane scrollPane = new JScrollPane(customTextArea);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-
-        // 固定サイズを指定せずに、行数・列数に基づく
-        customTextArea.setPreferredSize(null);
-
-        labeledComponent = new CustomLabeledComponent(japaneseLabel, scrollPane);
-        field = customTextArea;
-
-      } else {
-        CustomTextField textFieldStandard = new CustomTextField(20, style, 14);
-        labeledComponent = new CustomLabeledComponent(japaneseLabel, textFieldStandard);
-        field = textFieldStandard;
-
-      }
+      generateInputFields.generateFileds(fieldType, style, japaneseLabel);
+      labeledComponent = generateInputFields.getLabeledComponent();
+      field = generateInputFields.getField();
 
       innerGbc.gridx = index % columns; // 指定された列数に基づいて配置
       innerGbc.gridy = index / columns; // 行
@@ -129,6 +96,10 @@ public class CommonTab {
   /** フィールドの値を取得する */
   public Object getFieldValue(String fieldName) {
     Object field = fieldMap.get(fieldName);
+
+    if (field == null) {
+      throw new IllegalArgumentException("No field found for name: " + fieldName);
+    }
 
     if (field instanceof FormattedField<?>) {
       return ((FormattedField<?>) field).getFormattedValue();

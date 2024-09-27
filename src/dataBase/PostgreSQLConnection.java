@@ -49,8 +49,10 @@ public class PostgreSQLConnection {
 
   /** PreparedStatement にパラメータをセット */
   private void setParameters(PreparedStatement preparedStatement, Object... params) throws SQLException {
+    System.out.println("★★★★★★★★★★★★★★★★★★★");
     System.out.println(preparedStatement.toString());
     System.out.println(Arrays.toString(params));
+    System.out.println("★★★★★★★★★★★★★★★★★★★");
     for (int i = 0; i < params.length; i++) {
       Object value = params[i];
       if (value instanceof java.sql.Timestamp) {
