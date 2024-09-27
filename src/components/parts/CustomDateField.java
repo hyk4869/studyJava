@@ -11,6 +11,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,10 +19,11 @@ import java.util.Properties;
 import java.util.Locale;
 
 import src.components.enums.TextFieldStyle;
+import src.components.parts.interfaces.FormattedField;
 import src.components.styles.CustomStyledTextFields;
 
 /** 日付のinput */
-public final class CustomDateField extends CustomStyledTextFields {
+public final class CustomDateField extends CustomStyledTextFields implements FormattedField<Timestamp> {
 
   private JButton customEllipsisButton;
 
@@ -144,5 +146,20 @@ public final class CustomDateField extends CustomStyledTextFields {
       }
       return "";
     }
+  }
+
+  @Override
+  public Timestamp getFormattedValue() {
+    String text = getText();
+    if (text != null && !text.isEmpty()) {
+      try {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        java.util.Date parsedDate = dateFormat.parse(text);
+        return new Timestamp(parsedDate.getTime());
+      } catch (ParseException e) {
+        System.out.println("Invalid date format: " + text);
+      }
+    }
+    return null;
   }
 }

@@ -4,12 +4,13 @@ import javax.swing.text.NumberFormatter;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import src.components.enums.TextFieldStyle;
+import src.components.parts.interfaces.FormattedField;
 import src.components.styles.CustomStyledTextFields;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
 /** 数字のinput */
-public final class CustomNumericField extends CustomStyledTextFields {
+public final class CustomNumericField extends CustomStyledTextFields implements FormattedField<Integer> {
 
   public CustomNumericField(int columns, TextFieldStyle style, int fontSize) {
     super(style, fontSize);
@@ -45,5 +46,18 @@ public final class CustomNumericField extends CustomStyledTextFields {
     formatter.setAllowsInvalid(false);
     formatter.setCommitsOnValidEdit(true);
     return formatter;
+  }
+
+  @Override
+  public Integer getFormattedValue() {
+    String text = getText();
+    try {
+      if (text != null && !text.isEmpty()) {
+        return Integer.parseInt(text);
+      }
+    } catch (NumberFormatException e) {
+      System.out.println("Invalid number format: " + text);
+    }
+    return null;
   }
 }
