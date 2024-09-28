@@ -18,10 +18,10 @@ public class OverrideEachColumns {
   private Supplier<TableColumnModel> getColumnModelFunction;
   private ColumnsName columnsName;
 
-  public OverrideEachColumns(Function<String, Integer> getColumnIndexFunction,
+  public OverrideEachColumns(Function<String, Integer> getColumnIndexByName,
       Supplier<TableColumnModel> getColumnModelFunction, ColumnsName columnsName) {
 
-    this.getColumnIndexFunction = getColumnIndexFunction;
+    this.getColumnIndexFunction = getColumnIndexByName;
     this.getColumnModelFunction = getColumnModelFunction;
     this.columnsName = columnsName;
   }
