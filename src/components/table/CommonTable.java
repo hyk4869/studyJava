@@ -19,11 +19,14 @@ import src.components.enums.DefaultSortDateType;
 import src.components.table.override.checkbox.CheckBoxEditor;
 import src.components.table.override.checkbox.CheckBoxRenderer;
 import src.components.table.override.columns.ColumnsName;
+import src.components.table.override.columns.DeleteColumn;
 
 public class CommonTable extends JTable {
 
   private DefaultTableModel tableModel;
   private ColumnsName columnsName;
+  private DeleteColumn deleteColumn;
+
   private boolean isEditable;
   private boolean checkBoxColumnAdded = false;
 
@@ -35,6 +38,9 @@ public class CommonTable extends JTable {
     this.isEditable = isEditable;
     this.setRowSorter(new TableRowSorter<>(tableModel));
     this.setRowHeight(30);
+
+    this.deleteColumn = new DeleteColumn(this, tableModel, false);
+
   }
 
   /**
@@ -81,11 +87,13 @@ public class CommonTable extends JTable {
 
     // 編集モード時にチェックボックス列を追加
     if (isEditable && !checkBoxColumnAdded) {
-      addCheckBoxColumn();
+      deleteColumn.addCheckBoxColumn();
+      checkBoxColumnAdded = deleteColumn.getCheckBoxColumnAdded();
     }
     // 編集モードが終了したらチェックボックス列を削除
     else if (!isEditable && checkBoxColumnAdded) {
-      removeCheckBoxColumn();
+      deleteColumn.removeCheckBoxColumn();
+      checkBoxColumnAdded = deleteColumn.getCheckBoxColumnAdded();
     }
 
     this.revalidate();
@@ -98,39 +106,6 @@ public class CommonTable extends JTable {
   @Override
   public boolean isCellEditable(int row, int column) {
     return isEditable;
-  }
-
-  /**
-   * チェックボックス列を追加
-   */
-  private void addCheckBoxColumn() {
-    getTableModel().addColumn("Delete");
-    this.getColumnModel().getColumn(getTableModel().getColumnCount() - 1)
-        .setCellRenderer(new CheckBoxRenderer());
-    this.getColumnModel().getColumn(getTableModel().getColumnCount() - 1)
-        .setCellEditor(new CheckBoxEditor(new JCheckBox()));
-    checkBoxColumnAdded = true;
-  }
-
-  /**
-   * チェックボックス列を削除
-   */
-  private void removeCheckBoxColumn() {
-    if (checkBoxColumnAdded) {
-      // "Delete" カラムのインデックスを取得
-      int deleteColumnIndex = getColumnModel().getColumnCount() - 1;
-
-      // 表示から削除
-      getColumnModel().removeColumn(getColumnModel().getColumn(deleteColumnIndex));
-
-      // TableModelのカラム情報を直接操作
-      getTableModel().setColumnCount(getTableModel().getColumnCount() - 1);
-
-      this.revalidate();
-      this.repaint();
-
-      checkBoxColumnAdded = false;
-    }
   }
 
   /**
