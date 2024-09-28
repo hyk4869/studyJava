@@ -12,20 +12,19 @@ import java.util.Map;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import src.components.enums.DefaultSortDateType;
-import src.components.table.override.checkbox.CheckBoxEditor;
-import src.components.table.override.checkbox.CheckBoxRenderer;
 import src.components.table.override.columns.ColumnsName;
 import src.components.table.override.columns.DeleteColumn;
+import src.components.table.override.columns.OverrideEachColumns;
 
 public class CommonTable extends JTable {
 
   private DefaultTableModel tableModel;
   private ColumnsName columnsName;
   public DeleteColumn deleteColumn;
+  public OverrideEachColumns overrideEachColumns;
 
   private boolean isEditable;
   private boolean checkBoxColumnAdded = false;
@@ -40,6 +39,26 @@ public class CommonTable extends JTable {
     this.setRowHeight(30);
 
     this.deleteColumn = new DeleteColumn(this, tableModel, false);
+
+    this.overrideEachColumns = new OverrideEachColumns(
+        this::getColumnIndexByName,
+        this::getColumnModel,
+        columnsName);
+  }
+
+  /**
+   * テーブルパネルの作成
+   *
+   * @param panelTitle
+   * @return
+   */
+  public JPanel createTablePanel(String panelTitle) {
+    JPanel tablePanel = new JPanel(new BorderLayout());
+    tablePanel.setBorder(new TitledBorder(panelTitle));
+
+    JScrollPane scrollPane = new JScrollPane(this);
+    tablePanel.add(scrollPane, BorderLayout.CENTER);
+    return tablePanel;
   }
 
   /**
@@ -92,33 +111,18 @@ public class CommonTable extends JTable {
   }
 
   /**
-   * テーブルパネルの作成
-   *
-   * @param panelTitle
-   * @return
-   */
-  public JPanel createTablePanel(String panelTitle) {
-    JPanel tablePanel = new JPanel(new BorderLayout());
-    tablePanel.setBorder(new TitledBorder(panelTitle));
-
-    JScrollPane scrollPane = new JScrollPane(this);
-    tablePanel.add(scrollPane, BorderLayout.CENTER);
-    return tablePanel;
-  }
-
-  /**
    * 行を追加
    *
    * @param rowData
    */
-  public void addRow(ArrayList<Object> rowData) {
+  private void addRow(ArrayList<Object> rowData) {
     getTableModel().addRow(rowData.toArray());
   }
 
   /**
    * 全データをクリア
    */
-  public void clearTable() {
+  private void clearTable() {
     getTableModel().setRowCount(0);
   }
 
@@ -143,7 +147,7 @@ public class CommonTable extends JTable {
    * @param rows
    * @param sortColumnName
    */
-  public void reloadTableData(List<ArrayList<Object>> rows, DefaultSortDateType sortColumnName) {
+  private void reloadTableData(List<ArrayList<Object>> rows, DefaultSortDateType sortColumnName) {
     int sortColumnIndex = getColumnIndexByName(sortColumnName.name());
 
     clearTable();
@@ -151,26 +155,6 @@ public class CommonTable extends JTable {
     rows.stream()
         .sorted(Comparator.comparing(row -> (Timestamp) row.get(sortColumnIndex), Comparator.reverseOrder()))
         .forEach(d -> addRow(d));
-  }
-
-  /**
-   * 全データをロードしてテーブルに追加
-   *
-   * @param resultSet
-   */
-  public void loadAllTodoItems(ResultSet resultSet) {
-    try (resultSet) {
-      List<ArrayList<Object>> rows = new ArrayList<>();
-
-      while (resultSet.next()) {
-        rows.add(getRowData(resultSet)); // データをリストに追加
-      }
-
-      reloadTableData(rows, DefaultSortDateType.updatedAt);
-
-    } catch (SQLException ex) {
-      ex.printStackTrace();
-    }
   }
 
   /**
@@ -203,41 +187,23 @@ public class CommonTable extends JTable {
   }
 
   /**
-   * カラムの上書きとoverrideしたカラムの読み込み
+   * 全データをロードしてテーブルに追加
    *
-   * @param columnList ここで上書きしたいものを選択
-   * @param hiddenList 非表示にしたいものを選択
+   * @param resultSet
    */
-  public void reloadOverridedColumn(List<String> columnList, List<String> hiddenList) {
-    columnsName.overrideColumnLabel();
+  public void loadAllTodoItems(ResultSet resultSet) {
+    try (resultSet) {
+      List<ArrayList<Object>> rows = new ArrayList<>();
 
-    for (String columnName : columnList) {
-      int columnIndex = getColumnIndexByName(columnName);
-
-      if (columnIndex != 1 && columnsName.getColumnNames().containsKey(columnName)) {
-        String type = columnsName.getColumnNames().get(columnName);
-
-        // 必要に応じてここで独自のコンポーネントを呼ぶ
-        if (type.equals("Boolean")) {
-          TableColumn checkBoxColumn = getColumnModel().getColumn(columnIndex);
-          checkBoxColumn.setCellRenderer(new CheckBoxRenderer());
-          checkBoxColumn.setCellEditor(new CheckBoxEditor(new JCheckBox()));
-
-        }
-
+      while (resultSet.next()) {
+        rows.add(getRowData(resultSet)); // データをリストに追加
       }
-    }
 
-    for (String hiddenName : hiddenList) {
-      int columnIndex = getColumnIndexByName(hiddenName);
+      reloadTableData(rows, DefaultSortDateType.updatedAt);
 
-      if (columnIndex != -1) {
-        TableColumn column = getTable().getColumnModel().getColumn(columnIndex);
-
-        column.setMinWidth(0);
-        column.setMaxWidth(0);
-        column.setWidth(0);
-      }
+    } catch (SQLException ex) {
+      ex.printStackTrace();
     }
   }
+
 }

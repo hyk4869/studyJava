@@ -142,7 +142,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     mainPanel.add(formPanel, BorderLayout.NORTH);
     mainPanel.add(tablePanel, BorderLayout.CENTER);
 
-    commonTable.reloadOverridedColumn(Arrays.asList("isCompleted"), Arrays.asList("id"));
+    commonTable.overrideEachColumns.reloadOverridedColumn(Arrays.asList("isCompleted"), Arrays.asList("id"));
 
     // メインパネルをタブに追加
     tabbedPane.addTab("Add Todo", mainPanel);
@@ -164,7 +164,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     reloadButton.setEnabled(!isEditable);
 
     commonTable.setEditable(isEditable);
-    commonTable.reloadOverridedColumn(Arrays.asList("isCompleted"), Arrays.asList("id"));
+    commonTable.overrideEachColumns.reloadOverridedColumn(Arrays.asList("isCompleted"), Arrays.asList("id"));
     commonTable.getTableModel().removeTableModelListener(tableModelListener);
     commonTable.getTableModel().addTableModelListener(tableModelListener);
   }
@@ -305,8 +305,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
   @Override
   public void onEditModeChanged(boolean isEditable) {
     this.isEditable = isEditable;
-    commonTable.reloadOverridedColumn(Arrays.asList("isCompleted"),
-        Arrays.asList("id"));
+    commonTable.overrideEachColumns.reloadOverridedColumn(Arrays.asList("isCompleted"), Arrays.asList("id"));
   }
 
 }
