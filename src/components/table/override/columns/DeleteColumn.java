@@ -81,7 +81,7 @@ public class DeleteColumn {
     }
 
     List<String> idsToDelete = new ArrayList<>();
-    int deleteColumnIndex = commonTable.getColumnCount() - 1; // "Delete" 列のインデックス
+    int deleteColumnIndex = commonTable.getColumnCount() - 1;
 
     for (int i = commonTable.getRowCount() - 1; i >= 0; i--) {
       Object value = commonTable.getValueAt(i, deleteColumnIndex);

@@ -40,7 +40,6 @@ public class CommonTable extends JTable {
     this.setRowHeight(30);
 
     this.deleteColumn = new DeleteColumn(this, tableModel, false);
-
   }
 
   /**
@@ -68,22 +67,6 @@ public class CommonTable extends JTable {
    */
   public void setEditable(boolean isEditable) {
     this.isEditable = isEditable;
-
-    // 現在のデータを保存
-    ArrayList<Object[]> currentData = new ArrayList<>();
-    for (int i = 0; i < getTableModel().getRowCount(); i++) {
-      Object[] rowData = new Object[getTableModel().getColumnCount()];
-      for (int j = 0; j < getTableModel().getColumnCount(); j++) {
-        rowData[j] = getTableModel().getValueAt(i, j);
-      }
-      currentData.add(rowData);
-    }
-
-    // モデルを再作成して編集可否を反映
-    getTableModel().setRowCount(0);
-    for (Object[] rowData : currentData) {
-      getTableModel().addRow(rowData);
-    }
 
     // 編集モード時にチェックボックス列を追加
     if (isEditable && !checkBoxColumnAdded) {
