@@ -116,7 +116,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     reloadButton = footerButtons.generateFooterButton("Reload", e -> {
       try {
         ResultSet resultSet = todoQuery.getAllTodoItems();
-        commonTable.tableData.loadAllTodoItems(resultSet);
+        commonTable.tableData.loadItems(resultSet);
       } catch (SQLException ex) {
         ex.printStackTrace();
       }
@@ -149,7 +149,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
 
     try {
       ResultSet resultSet = todoQuery.getAllTodoItems();
-      commonTable.tableData.loadAllTodoItems(resultSet);
+      commonTable.tableData.loadItems(resultSet);
     } catch (SQLException ex) {
       ex.printStackTrace();
     }
@@ -174,7 +174,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     try {
       todoQuery.deleteTodoItemsByIds(idsToDelete.toArray(new String[0]));
 
-      commonTable.tableData.loadAllTodoItems(todoQuery.getAllTodoItems());
+      commonTable.tableData.loadItems(todoQuery.getAllTodoItems());
 
       connection.commit();
       System.out.println("Selected rows deleted successfully.");
@@ -234,7 +234,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
         todoQuery.updateTodoItem(updatedValues);
       }
 
-      commonTable.tableData.loadAllTodoItems(todoQuery.getAllTodoItems());
+      commonTable.tableData.loadItems(todoQuery.getAllTodoItems());
       connection.commit();
       modifiedRows.clear();
 
@@ -281,7 +281,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
       // Todo項目を挿入
       todoQuery.insertTodoItem(newTodoItem);
 
-      commonTable.tableData.loadAllTodoItems(todoQuery.getAllTodoItems());
+      commonTable.tableData.loadItems(todoQuery.getAllTodoItems());
 
       connection.commit();
       System.out.println("Todo item inserted and committed successfully.");

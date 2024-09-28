@@ -13,6 +13,7 @@ import javax.swing.table.DefaultTableModel;
 
 import src.components.enums.DefaultSortDateType;
 
+/** テーブルのデータを扱う箇所 */
 public class TableData {
 
   private Function<String, Integer> getColumnIndexFunction;
@@ -85,11 +86,11 @@ public class TableData {
   }
 
   /**
-   * 全データをロードしてテーブルに追加
+   * データをロードしてテーブルに追加
    *
    * @param resultSet
    */
-  public void loadAllTodoItems(ResultSet resultSet) {
+  public void loadItems(ResultSet resultSet) {
     try (resultSet) {
       List<ArrayList<Object>> rows = new ArrayList<>();
 

@@ -13,6 +13,7 @@ import src.components.table.override.columns.ColumnsName;
 import src.components.table.override.columns.DeleteColumn;
 import src.components.table.override.columns.OverrideEachColumns;
 
+/** 共通のテーブル */
 public class CommonTable extends JTable {
 
   private DefaultTableModel tableModel;
