@@ -22,32 +22,24 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 import src.components.enums.TextFieldStyle;
-import src.components.labels.FieldLabel;
 import src.components.parts.CustomButton;
 import src.components.table.CommonTable;
 import src.components.table.columns.TableColumnName;
 import src.dataBase.PostgreSQLConnection;
 import src.dataBase.query.TodoListPannelQuery;
-import src.tab.CommonTab;
 import src.tab.footer.FooterButtons;
-import src.tab.footer.FooterButtonsInterface;
-import src.utils.CommonColor;
+import src.views.common.CommonViewPannel;
 
-public class TodoListPannel implements ActionListener, FooterButtonsInterface {
+public class TodoListPannel extends CommonViewPannel implements ActionListener {
 
-  private CommonTable commonTable;
-  private CommonTab commonTab = new CommonTab();
   private PostgreSQLConnection connection;
   private TodoListPannelQuery todoQuery;
   /** テーブルの編集 */
   private boolean isEditable = false;
   private HashSet<Integer> modifiedRows = new HashSet<>();
   private TableColumnName tableColumns = new TableColumnName();
-  private CommonColor commonColor = new CommonColor();
   private CustomButton addTodoButton = new CustomButton();
-  private FieldLabel fieldLabel = new FieldLabel();
   public FooterButtons footerButtons = new FooterButtons();
-  private GridBagConstraints gbc = new GridBagConstraints();
 
   public CustomButton saveButton;
   public CustomButton reloadButton;
@@ -301,11 +293,4 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     commonTab.setFieldValue("description", "");
     commonTab.setFieldValue("isCompleted", false);
   }
-
-  @Override
-  public void onEditModeChanged(boolean isEditable) {
-    this.isEditable = isEditable;
-    commonTable.overrideEachColumns.reloadOverridedColumn(Arrays.asList("isCompleted"), Arrays.asList("id"));
-  }
-
 }

@@ -16,23 +16,16 @@ import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
 import src.components.enums.TextFieldStyle;
-import src.components.labels.FieldLabel;
 import src.components.parts.CustomButton;
 import src.components.table.CommonTable;
 import src.components.table.columns.TableColumnName;
 import src.dataBase.PostgreSQLConnection;
 import src.dataBase.query.SearchTodoPannelQuery;
-import src.tab.CommonTab;
-import src.utils.CommonColor;
+import src.views.common.CommonViewPannel;
 
-public class SearchTodoPannel {
+public class SearchTodoPannel extends CommonViewPannel {
   private SearchTodoPannelQuery searchTodoQuery;
-  private CommonTable commonTable;
-  private CommonTab commonTab = new CommonTab();
   private TableColumnName tableColumns = new TableColumnName();
-  private CommonColor commonColor = new CommonColor();
-  private FieldLabel fieldLabel = new FieldLabel();
-  private GridBagConstraints gbc = new GridBagConstraints();
   private CustomButton customButton = new CustomButton();
 
   public SearchTodoPannel(PostgreSQLConnection connection) {
