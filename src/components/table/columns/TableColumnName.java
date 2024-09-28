@@ -17,6 +17,7 @@ public class TableColumnName {
       put("updatedByName", "更新者");
       put("createdAt", "作成日時");
       put("updatedAt", "更新日時");
+      put("deletedAt", "削除日時");
       put("isCompleted", "完了");
       put("sort", "並び順");
     }
@@ -35,6 +36,7 @@ public class TableColumnName {
       put("updatedByName", "String");
       put("createdAt", "Timestamp");
       put("updatedAt", "Timestamp");
+      put("deletedAt", "Timestamp");
       put("isCompleted", "Boolean");
       put("sort", "Integer");
     }

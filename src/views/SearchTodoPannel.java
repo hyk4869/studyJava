@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,6 +70,9 @@ public class SearchTodoPannel extends CommonViewPannel {
     mainPanel.add(tablePanel, BorderLayout.CENTER);
 
     tabbedPane.addTab("Search Todo", mainPanel);
+
+    commonTable.overrideEachColumns.reloadOverridedColumn(Arrays.asList("isCompleted"), Arrays.asList(""));
+
   }
 
   public void getContent() {
