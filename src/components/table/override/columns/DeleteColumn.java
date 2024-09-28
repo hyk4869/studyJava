@@ -1,5 +1,8 @@
 package src.components.table.override.columns;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -12,37 +15,39 @@ public class DeleteColumn {
   private DefaultTableModel tableModel;
   private boolean checkBoxColumnAdded;
 
+  private CheckBoxRenderer checkBoxRenderer;
+  private CheckBoxEditor checkBoxEditor;
+
   public DeleteColumn(JTable commonTable, DefaultTableModel tableModel, boolean checkBoxColumnAdded) {
     this.commonTable = commonTable;
     this.tableModel = tableModel;
     this.checkBoxColumnAdded = checkBoxColumnAdded;
+
+    this.checkBoxRenderer = new CheckBoxRenderer();
+    this.checkBoxEditor = new CheckBoxEditor(new JCheckBox());
   }
 
   /**
-   * DELETEチェックボックス列を追加
+   * DELETEチェックボックスの追加
    */
   public void addCheckBoxColumn() {
-    // モデルに "Delete" カラムを追加
     tableModel.addColumn("Delete");
 
-    // テーブルの再描画
     commonTable.revalidate();
     commonTable.repaint();
 
-    // カラムモデルが正しく反映された後にレンダラとエディタを設定
     int deleteColumnIndex = tableModel.getColumnCount() - 1;
-    commonTable.getColumnModel().getColumn(deleteColumnIndex).setCellRenderer(new CheckBoxRenderer());
-    commonTable.getColumnModel().getColumn(deleteColumnIndex).setCellEditor(new CheckBoxEditor(new JCheckBox()));
+    commonTable.getColumnModel().getColumn(deleteColumnIndex).setCellRenderer(checkBoxRenderer);
+    commonTable.getColumnModel().getColumn(deleteColumnIndex).setCellEditor(checkBoxEditor);
 
     checkBoxColumnAdded = true;
   }
 
   /**
-   * DELETEチェックボックス列を削除
+   * DELETEチェックボックスの削除
    */
   public void removeCheckBoxColumn() {
     if (checkBoxColumnAdded) {
-      // "Delete" カラムのインデックスを取得
       int deleteColumnIndex = -1;
       for (int i = 0; i < commonTable.getColumnModel().getColumnCount(); i++) {
         if (commonTable.getColumnModel().getColumn(i).getHeaderValue().equals("Delete")) {
@@ -51,10 +56,8 @@ public class DeleteColumn {
         }
       }
 
-      // カラムが見つかった場合のみ削除
       if (deleteColumnIndex != -1) {
         commonTable.getColumnModel().removeColumn(commonTable.getColumnModel().getColumn(deleteColumnIndex));
-        // TableModelのカラム情報を直接操作
         tableModel.setColumnCount(tableModel.getColumnCount() - 1);
 
         commonTable.revalidate();
@@ -65,6 +68,30 @@ public class DeleteColumn {
         System.out.println("Deleteカラムが見つかりませんでした。");
       }
     }
+  }
+
+  /**
+   * 選択された行の削除
+   *
+   * @return
+   */
+  public List<String> deleteSelectedRows() {
+    if (commonTable.getCellEditor() != null) {
+      commonTable.getCellEditor().stopCellEditing();
+    }
+
+    List<String> idsToDelete = new ArrayList<>();
+    int deleteColumnIndex = commonTable.getColumnCount() - 1; // "Delete" 列のインデックス
+
+    for (int i = commonTable.getRowCount() - 1; i >= 0; i--) {
+      Object value = commonTable.getValueAt(i, deleteColumnIndex);
+      if (value instanceof Boolean && (Boolean) value) {
+        String id = (String) commonTable.getValueAt(i, 0);
+        idsToDelete.add(id);
+        tableModel.removeRow(i);
+      }
+    }
+    return idsToDelete;
   }
 
   public boolean getCheckBoxColumnAdded() {

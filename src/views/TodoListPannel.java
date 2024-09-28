@@ -123,7 +123,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
     }, true, commonColor.commonMUIBlue());
 
     deleteButton = footerButtons.generateFooterButton("Delete", e -> {
-      List<String> idsToDelete = commonTable.deleteSelectedRows();
+      List<String> idsToDelete = commonTable.deleteColumn.deleteSelectedRows();
       if (!idsToDelete.isEmpty()) {
         deleteFromDatabase(idsToDelete);
       }

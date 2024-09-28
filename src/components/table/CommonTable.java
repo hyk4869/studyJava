@@ -25,7 +25,7 @@ public class CommonTable extends JTable {
 
   private DefaultTableModel tableModel;
   private ColumnsName columnsName;
-  private DeleteColumn deleteColumn;
+  public DeleteColumn deleteColumn;
 
   private boolean isEditable;
   private boolean checkBoxColumnAdded = false;
@@ -152,30 +152,6 @@ public class CommonTable extends JTable {
       }
     }
     return -1;
-  }
-
-  /**
-   * 選択された行の削除
-   *
-   * @return
-   */
-  public List<String> deleteSelectedRows() {
-    if (getCellEditor() != null) {
-      getCellEditor().stopCellEditing();
-    }
-
-    List<String> idsToDelete = new ArrayList<>();
-    int deleteColumnIndex = getColumnCount() - 1; // "Delete" 列のインデックス
-
-    for (int i = getRowCount() - 1; i >= 0; i--) {
-      Object value = getValueAt(i, deleteColumnIndex);
-      if (value instanceof Boolean && (Boolean) value) {
-        String id = (String) getValueAt(i, 0);
-        idsToDelete.add(id);
-        getTableModel().removeRow(i);
-      }
-    }
-    return idsToDelete;
   }
 
   /**
