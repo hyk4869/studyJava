@@ -5,11 +5,14 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.swing.JCheckBox;
+import javax.swing.JTextField;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import src.components.table.override.checkbox.CheckBoxEditor;
 import src.components.table.override.checkbox.CheckBoxRenderer;
+import src.components.table.override.numeric.NumericEditor;
+import src.components.table.override.numeric.NumericRenderer;
 
 /** カラムの上書きとoverrideしたカラムの読み込み */
 public class OverrideEachColumns {
@@ -40,12 +43,16 @@ public class OverrideEachColumns {
 
       if (columnIndex != 1 && columnsName.getColumnNames().containsKey(columnName)) {
         String type = columnsName.getColumnNames().get(columnName);
-
         // 必要に応じてここで独自のコンポーネントを呼ぶ
         if (type.equals("Boolean")) {
           TableColumn checkBoxColumn = getColumnModelFunction.get().getColumn(columnIndex);
           checkBoxColumn.setCellRenderer(new CheckBoxRenderer());
           checkBoxColumn.setCellEditor(new CheckBoxEditor(new JCheckBox()));
+
+        } else if (type.equals("Integer")) {
+          TableColumn numericColumn = getColumnModelFunction.get().getColumn(columnIndex);
+          numericColumn.setCellRenderer(new NumericRenderer());
+          numericColumn.setCellEditor(new NumericEditor(new JTextField()));
 
         }
 

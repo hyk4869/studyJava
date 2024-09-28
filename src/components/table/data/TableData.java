@@ -67,8 +67,7 @@ public class TableData {
     ArrayList<Object> rowData = new ArrayList<>();
     int columnCount = getTableModelFunction.get().getColumnCount();
 
-    // 最後の列 "Select" を無視するため、columnCount - 1 にする
-    for (int i = 0; i < columnCount - 1; i++) {
+    for (int i = 0; i < columnCount; i++) {
       String columnName = getTableModelFunction.get().getColumnName(i);
       if (!columnName.equals("Delete")) {
         try {

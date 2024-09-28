@@ -46,6 +46,9 @@ public class TodoListPannel extends CommonViewPannel implements ActionListener {
   public CustomButton deleteButton;
   public CustomButton editButton;
 
+  private Runnable reloadColumns = () -> commonTable.overrideEachColumns.reloadOverridedColumn(
+      Arrays.asList("isCompleted", "sort"), Arrays.asList("id"));
+
   /** テーブルのデータモデルに変更があった場合の変更をキャッチ */
   private TableModelListener tableModelListener = new TableModelListener() {
     @Override
@@ -71,7 +74,7 @@ public class TodoListPannel extends CommonViewPannel implements ActionListener {
         TextFieldStyle.STANDARD, 1);
 
     Map<String, String> newTodoListColumn = tableColumns.pickColumns(tableColumns.TODO_LIST_COLUMNS,
-        Arrays.asList("id", "title", "description", "isCompleted", "sort", "updatedAt"));
+        Arrays.asList("id", "title", "description", "isCompleted", "updatedAt", "sort"));
 
     commonTable = new CommonTable(isEditable, newTodoListColumn, tableColumns.TODO_LIST_COLUMN_LABELS);
 
@@ -134,7 +137,7 @@ public class TodoListPannel extends CommonViewPannel implements ActionListener {
     mainPanel.add(formPanel, BorderLayout.NORTH);
     mainPanel.add(tablePanel, BorderLayout.CENTER);
 
-    commonTable.overrideEachColumns.reloadOverridedColumn(Arrays.asList("isCompleted"), Arrays.asList("id"));
+    reloadColumns.run();
 
     // メインパネルをタブに追加
     tabbedPane.addTab("Add Todo", mainPanel);
@@ -156,7 +159,7 @@ public class TodoListPannel extends CommonViewPannel implements ActionListener {
     reloadButton.setEnabled(!isEditable);
 
     commonTable.setEditable(isEditable);
-    commonTable.overrideEachColumns.reloadOverridedColumn(Arrays.asList("isCompleted"), Arrays.asList("id"));
+    reloadColumns.run();
     commonTable.getTableModel().removeTableModelListener(tableModelListener);
     commonTable.getTableModel().addTableModelListener(tableModelListener);
   }
@@ -213,8 +216,9 @@ public class TodoListPannel extends CommonViewPannel implements ActionListener {
             commonTable.getColumnIndexByName("description")));
         updatedValues.put("isCompleted", commonTable.getTableModel().getValueAt(modelRowIndex,
             commonTable.getColumnIndexByName("isCompleted")));
-        updatedValues.put("sort", commonTable.getTableModel().getValueAt(modelRowIndex,
-            commonTable.getColumnIndexByName("sort")));
+        updatedValues.put("sort",
+            commonTable.getTableModel().getValueAt(modelRowIndex,
+                commonTable.getColumnIndexByName("sort")));
 
         // タイトルの重複チェック
         if (todoQuery.isTitleDuplicated((String) updatedValues.get("title"), id)) {
@@ -252,6 +256,29 @@ public class TodoListPannel extends CommonViewPannel implements ActionListener {
     Object description = commonTab.getFieldValue("description");
     Object isCompleted = commonTab.getFieldValue("isCompleted");
 
+    int maxSort = 0;
+
+    try {
+      ResultSet resultSet = todoQuery.getAllTodoItems();
+      List<Integer> sortValues = new ArrayList<>();
+
+      while (resultSet.next()) {
+        Integer sortValue = (Integer) resultSet.getObject("sort");
+        if (sortValue != null) {
+          sortValues.add(sortValue);
+        }
+      }
+
+      if (!sortValues.isEmpty()) {
+        maxSort = sortValues.stream().max(Integer::compareTo).orElse(0) + 1;
+      } else {
+        maxSort = 1;
+      }
+
+    } catch (SQLException ex) {
+      ex.printStackTrace();
+    }
+
     newTodoItem.put("id", java.util.UUID.randomUUID().toString());
     newTodoItem.put("createdById", "ce3b1d98-2ed8-4a02-a5c3-9e8f9e5c20f7");
     newTodoItem.put("updatedById", "ce3b1d98-2ed8-4a02-a5c3-9e8f9e5c20f7");
@@ -262,7 +289,7 @@ public class TodoListPannel extends CommonViewPannel implements ActionListener {
     newTodoItem.put("title", title);
     newTodoItem.put("description", description);
     newTodoItem.put("isCompleted", isCompleted);
-    newTodoItem.put("sort", 0);
+    newTodoItem.put("sort", maxSort);
 
     try {
       // タイトルの重複チェック
