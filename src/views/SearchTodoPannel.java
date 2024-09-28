@@ -26,24 +26,21 @@ import src.tab.CommonTab;
 import src.utils.CommonColor;
 
 public class SearchTodoPannel {
-
-  private PostgreSQLConnection connection;
   private SearchTodoPannelQuery searchTodoQuery;
-
   private CommonTable commonTable;
+  private CommonTab commonTab = new CommonTab();
   private TableColumnName tableColumns = new TableColumnName();
   private CommonColor commonColor = new CommonColor();
   private FieldLabel fieldLabel = new FieldLabel();
-  private CommonTab commonTab;
+  private GridBagConstraints gbc = new GridBagConstraints();
+  private CustomButton customButton = new CustomButton();
 
   public SearchTodoPannel(PostgreSQLConnection connection) {
     this.searchTodoQuery = new SearchTodoPannelQuery(connection);
-    this.connection = connection;
   }
 
   /** mainメソッドにSearchTodoタブとその中身を生成 */
   public void GenerateSearchTodoTab(JTabbedPane tabbedPane) {
-    GridBagConstraints gbc = new GridBagConstraints();
     gbc.gridx = 2;
     gbc.gridy = 3;
     gbc.gridwidth = 1;
@@ -51,8 +48,6 @@ public class SearchTodoPannel {
     gbc.anchor = GridBagConstraints.EAST;
     gbc.weightx = 1.0;
     gbc.insets = new Insets(10, 0, 0, 0);
-
-    commonTab = new CommonTab();
 
     commonTable = new CommonTable(false, tableColumns.TODO_LIST_COLUMNS, tableColumns.TODO_LIST_COLUMN_LABELS);
 
@@ -67,7 +62,6 @@ public class SearchTodoPannel {
         fieldLabel.SEARCH_FIELD_LABELS,
         TextFieldStyle.STANDARD, 3);
 
-    CustomButton customButton = new CustomButton();
     customButton.addButton("Search Todo", 2, (fieldLabel.SEARCH_FIELD_CONFIG.size() + 2) / 3, 1, new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
