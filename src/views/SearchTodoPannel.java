@@ -19,7 +19,7 @@ import src.components.enums.TextFieldStyle;
 import src.components.labels.FieldLabel;
 import src.components.parts.CustomButton;
 import src.components.table.CommonTable;
-import src.components.table.columns.TableColumns;
+import src.components.table.columns.TableColumnName;
 import src.dataBase.PostgreSQLConnection;
 import src.dataBase.query.SearchTodoPannelQuery;
 import src.tab.CommonTab;
@@ -31,7 +31,7 @@ public class SearchTodoPannel {
   private SearchTodoPannelQuery searchTodoQuery;
 
   private CommonTable commonTable;
-  private TableColumns tableColumns = new TableColumns();
+  private TableColumnName tableColumns = new TableColumnName();
   private CommonColor commonColor = new CommonColor();
   private FieldLabel fieldLabel = new FieldLabel();
   private CommonTab commonTab;

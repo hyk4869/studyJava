@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class TableColumns {
+public class TableColumnName {
 
   /** カラム名（英語）と対応する日本語ラベル */
   public final Map<String, String> TODO_LIST_COLUMN_LABELS = new LinkedHashMap<>() {

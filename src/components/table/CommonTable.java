@@ -23,14 +23,14 @@ import src.components.table.override.columns.ColumnsName;
 public class CommonTable extends JTable {
 
   private DefaultTableModel tableModel;
+  private ColumnsName columnsName;
   private boolean isEditable;
   private boolean checkBoxColumnAdded = false;
-  private ColumnsName columnsName;
 
   public CommonTable(boolean isEditable, Map<String, String> columnNames, Map<String, String> columnLabels) {
     super(new DefaultTableModel(columnNames.keySet().toArray(), 0));
-    columnsName = new ColumnsName(this, columnNames, columnLabels);
 
+    columnsName = new ColumnsName(this, columnNames, columnLabels);
     this.tableModel = (DefaultTableModel) this.getModel();
     this.isEditable = isEditable;
     this.setRowSorter(new TableRowSorter<>(tableModel));
@@ -124,13 +124,28 @@ public class CommonTable extends JTable {
       getColumnModel().removeColumn(getColumnModel().getColumn(deleteColumnIndex));
 
       // TableModelのカラム情報を直接操作
-      tableModel.setColumnCount(tableModel.getColumnCount() - 1);
+      getTableModel().setColumnCount(getTableModel().getColumnCount() - 1);
 
       this.revalidate();
       this.repaint();
 
       checkBoxColumnAdded = false;
     }
+  }
+
+  /**
+   * テーブルパネルの作成
+   *
+   * @param panelTitle
+   * @return
+   */
+  public JPanel createTablePanel(String panelTitle) {
+    JPanel tablePanel = new JPanel(new BorderLayout());
+    tablePanel.setBorder(new TitledBorder(panelTitle));
+
+    JScrollPane scrollPane = new JScrollPane(this);
+    tablePanel.add(scrollPane, BorderLayout.CENTER);
+    return tablePanel;
   }
 
   /**
@@ -150,18 +165,18 @@ public class CommonTable extends JTable {
   }
 
   /**
-   * テーブルパネルの作成
+   * 列名からインデックスを取得する
    *
-   * @param panelTitle
+   * @param columnName
    * @return
    */
-  public JPanel createTablePanel(String panelTitle) {
-    JPanel tablePanel = new JPanel(new BorderLayout());
-    tablePanel.setBorder(new TitledBorder(panelTitle));
-
-    JScrollPane scrollPane = new JScrollPane(this);
-    tablePanel.add(scrollPane, BorderLayout.CENTER);
-    return tablePanel;
+  public int getColumnIndexByName(String columnName) {
+    for (int i = 0; i < getColumnCount(); i++) {
+      if (getColumnName(i).equals(columnName)) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   /**
@@ -186,21 +201,6 @@ public class CommonTable extends JTable {
       }
     }
     return idsToDelete;
-  }
-
-  /**
-   * 列名からインデックスを取得する
-   *
-   * @param columnName
-   * @return
-   */
-  public int getColumnIndexByName(String columnName) {
-    for (int i = 0; i < getColumnCount(); i++) {
-      if (getColumnName(i).equals(columnName)) {
-        return i;
-      }
-    }
-    return -1;
   }
 
   /**

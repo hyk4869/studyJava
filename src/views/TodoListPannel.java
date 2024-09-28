@@ -25,7 +25,7 @@ import src.components.enums.TextFieldStyle;
 import src.components.labels.FieldLabel;
 import src.components.parts.CustomButton;
 import src.components.table.CommonTable;
-import src.components.table.columns.TableColumns;
+import src.components.table.columns.TableColumnName;
 import src.dataBase.PostgreSQLConnection;
 import src.dataBase.query.TodoListPannelQuery;
 import src.tab.CommonTab;
@@ -42,7 +42,7 @@ public class TodoListPannel implements ActionListener, FooterButtonsInterface {
   /** テーブルの編集 */
   private boolean isEditable = false;
   private HashSet<Integer> modifiedRows = new HashSet<>();
-  private TableColumns tableColumns = new TableColumns();
+  private TableColumnName tableColumns = new TableColumnName();
   private CommonColor commonColor = new CommonColor();
   private CustomButton addTodoButton = new CustomButton();
   private FieldLabel fieldLabel = new FieldLabel();
