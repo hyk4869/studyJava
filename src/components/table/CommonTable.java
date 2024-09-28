@@ -1,12 +1,6 @@
 package src.components.table;
 
 import java.awt.BorderLayout;
-import java.sql.Timestamp;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.*;
@@ -14,7 +8,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
-import src.components.enums.DefaultSortDateType;
+import src.components.table.data.TableData;
 import src.components.table.override.columns.ColumnsName;
 import src.components.table.override.columns.DeleteColumn;
 import src.components.table.override.columns.OverrideEachColumns;
@@ -25,6 +19,7 @@ public class CommonTable extends JTable {
   private ColumnsName columnsName;
   public DeleteColumn deleteColumn;
   public OverrideEachColumns overrideEachColumns;
+  public TableData tableData;
 
   private boolean isEditable;
   private boolean checkBoxColumnAdded = false;
@@ -33,8 +28,10 @@ public class CommonTable extends JTable {
     super(new DefaultTableModel(columnNames.keySet().toArray(), 0));
 
     columnsName = new ColumnsName(this, columnNames, columnLabels);
+
     this.tableModel = (DefaultTableModel) this.getModel();
     this.isEditable = isEditable;
+
     this.setRowSorter(new TableRowSorter<>(tableModel));
     this.setRowHeight(30);
 
@@ -44,6 +41,10 @@ public class CommonTable extends JTable {
         this::getColumnIndexByName,
         this::getColumnModel,
         columnsName);
+
+    this.tableData = new TableData(
+        this::getTableModel,
+        this::getColumnIndexByName);
   }
 
   /**
@@ -111,22 +112,6 @@ public class CommonTable extends JTable {
   }
 
   /**
-   * 行を追加
-   *
-   * @param rowData
-   */
-  private void addRow(ArrayList<Object> rowData) {
-    getTableModel().addRow(rowData.toArray());
-  }
-
-  /**
-   * 全データをクリア
-   */
-  private void clearTable() {
-    getTableModel().setRowCount(0);
-  }
-
-  /**
    * 列名からインデックスを取得する
    *
    * @param columnName
@@ -139,71 +124,6 @@ public class CommonTable extends JTable {
       }
     }
     return -1;
-  }
-
-  /**
-   * データをリロードするメソッド
-   *
-   * @param rows
-   * @param sortColumnName
-   */
-  private void reloadTableData(List<ArrayList<Object>> rows, DefaultSortDateType sortColumnName) {
-    int sortColumnIndex = getColumnIndexByName(sortColumnName.name());
-
-    clearTable();
-
-    rows.stream()
-        .sorted(Comparator.comparing(row -> (Timestamp) row.get(sortColumnIndex), Comparator.reverseOrder()))
-        .forEach(d -> addRow(d));
-  }
-
-  /**
-   * ResultSetから1行分のデータを取得
-   *
-   * @param resultSet
-   * @return
-   * @throws SQLException
-   */
-  private ArrayList<Object> getRowData(ResultSet resultSet) throws SQLException {
-    ArrayList<Object> rowData = new ArrayList<>();
-    int columnCount = getTableModel().getColumnCount();
-
-    // 最後の列 "Select" を無視するため、columnCount - 1 にする
-    for (int i = 0; i < columnCount - 1; i++) {
-      String columnName = getTableModel().getColumnName(i);
-      if (!columnName.equals("Delete")) {
-        try {
-          if (!columnName.equals("Delete")) {
-            // ResultSet からカラム名に対応するデータを取得
-            Object value = resultSet.getObject(columnName);
-            rowData.add(value);
-          }
-        } catch (SQLException e) {
-          System.out.println("カラムが一致しません: " + columnName);
-        }
-      }
-    }
-    return rowData;
-  }
-
-  /**
-   * 全データをロードしてテーブルに追加
-   *
-   * @param resultSet
-   */
-  public void loadAllTodoItems(ResultSet resultSet) {
-    try (resultSet) {
-      List<ArrayList<Object>> rows = new ArrayList<>();
-
-      while (resultSet.next()) {
-        rows.add(getRowData(resultSet)); // データをリストに追加
-      }
-
-      reloadTableData(rows, DefaultSortDateType.updatedAt);
-
-    } catch (SQLException ex) {
-      ex.printStackTrace();
-    }
   }
 
 }

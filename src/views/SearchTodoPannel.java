@@ -128,7 +128,7 @@ public class SearchTodoPannel {
 
     try {
       ResultSet rs = searchTodoQuery.searchTodoList(searchParams);
-      commonTable.loadAllTodoItems(rs);
+      commonTable.tableData.loadAllTodoItems(rs);
     } catch (SQLException e) {
       e.printStackTrace();
     }
