@@ -259,6 +259,14 @@ public class TodoListPannel extends CommonViewPannel implements ActionListener {
     Object description = commonTab.getFieldValue("description");
     Object isCompleted = commonTab.getFieldValue("isCompleted");
 
+    if (title == null || title.toString().trim().isEmpty()) {
+      throw new IllegalArgumentException("タイトルが空です");
+      // javax.swing.JOptionPane.showMessageDialog(null, "Title cannot be empty",
+      // "Input Error",
+      // javax.swing.JOptionPane.ERROR_MESSAGE);
+      // return;
+    }
+
     int maxSort = 0;
 
     try {
