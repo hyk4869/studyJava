@@ -2,6 +2,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "MigrationMain",
+      "request": "launch",
+      "mainClass": "SQL.migration.MigrationMain",
+      "projectName": "studyJava_301f17e9"
+    },
+    {
+      "type": "java",
       "name": "CustomFrame",
       "request": "launch",
       "mainClass": "src.components.frame.CustomFrame",

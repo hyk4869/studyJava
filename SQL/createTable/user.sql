@@ -5,6 +5,6 @@ CREATE TABLE "User"(
   "deletedAt" TIMESTAMP WITH TIME ZONE,
   "username" VARCHAR(64) UNIQUE NOT NULL,
   "passwordHash" VARCHAR(128) NOT NULL
-)
+);
 
 -- DROP TABLE "User"

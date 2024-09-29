@@ -65,6 +65,7 @@ public class TodoListPannelQuery {
 
   /** Todo項目を更新するクエリ */
   public void updateTodoItem(Map<String, Object> updatedValues) throws SQLException {
+    /** 可変長の文字列を用意 */
     StringBuilder setClause = new StringBuilder();
     List<Object> params = new ArrayList<>();
 
