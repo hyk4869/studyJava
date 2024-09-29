@@ -43,7 +43,10 @@ public class SearchTodoPannel extends CommonViewPannel {
     gbc.weightx = 1.0;
     gbc.insets = new Insets(10, 0, 0, 0);
 
-    commonTable = new CommonTable(false, tableColumns.TODO_LIST_COLUMNS, tableColumns.TODO_LIST_COLUMN_LABELS);
+    String[] notEditProperties = {};
+
+    commonTable = new CommonTable(false, tableColumns.TODO_LIST_COLUMNS, tableColumns.TODO_LIST_COLUMN_LABELS,
+        notEditProperties);
 
     /** メインパネルの作成 */
     JPanel mainPanel = new JPanel(new BorderLayout());

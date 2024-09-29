@@ -21,11 +21,13 @@ public class CommonTable extends JTable {
   public DeleteColumn deleteColumn;
   public OverrideEachColumns overrideEachColumns;
   public TableData tableData;
+  private String[] notEditProperties;
 
   private boolean isEditable;
   private boolean checkBoxColumnAdded = false;
 
-  public CommonTable(boolean isEditable, Map<String, String> columnNames, Map<String, String> columnLabels) {
+  public CommonTable(boolean isEditable, Map<String, String> columnNames, Map<String, String> columnLabels,
+      String[] notEditProperties) {
     super(new DefaultTableModel(columnNames.keySet().toArray(), 0));
 
     columnsName = new ColumnsName(this, columnNames, columnLabels);
@@ -46,6 +48,8 @@ public class CommonTable extends JTable {
     this.tableData = new TableData(
         this::getTableModel,
         this::getColumnIndexByName);
+
+    this.notEditProperties = notEditProperties;
   }
 
   /**
@@ -109,6 +113,12 @@ public class CommonTable extends JTable {
    */
   @Override
   public boolean isCellEditable(int row, int column) {
+    for (String columnName : notEditProperties) {
+      int targetColumn = getColumnIndexByName(columnName);
+      if (column == targetColumn) {
+        return false;
+      }
+    }
     return isEditable;
   }
 

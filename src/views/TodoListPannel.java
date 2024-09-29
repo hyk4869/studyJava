@@ -76,7 +76,10 @@ public class TodoListPannel extends CommonViewPannel implements ActionListener {
     Map<String, String> newTodoListColumn = tableColumns.pickColumns(tableColumns.TODO_LIST_COLUMNS,
         Arrays.asList("id", "title", "description", "isCompleted", "updatedAt", "sort"));
 
-    commonTable = new CommonTable(isEditable, newTodoListColumn, tableColumns.TODO_LIST_COLUMN_LABELS);
+    String[] notEditProperties = { "updatedAt" };
+
+    commonTable = new CommonTable(isEditable, newTodoListColumn, tableColumns.TODO_LIST_COLUMN_LABELS,
+        notEditProperties);
 
     commonTable.getTableModel().addTableModelListener(tableModelListener);
 
