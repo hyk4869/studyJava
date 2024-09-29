@@ -17,7 +17,7 @@ public class PostgreSQLConnection {
 
     try {
       connection = DriverManager.getConnection(url, user, password);
-      connection.setAutoCommit(false); // トランザクションを開始
+      connection.setAutoCommit(false);
       System.out.println("Connection established successfully.");
     } catch (SQLException e) {
       e.printStackTrace();
@@ -28,19 +28,7 @@ public class PostgreSQLConnection {
     return connection;
   }
 
-  /** SELECT文をPreparedStatementで実行 */
-  public ResultSet executeQuery(String query, Object... params) throws SQLException {
-    PreparedStatement preparedStatement = prepareStatement(query, params);
-    return preparedStatement.executeQuery();
-  }
-
-  /** INSERT, UPDATE, DELETE 文をPreparedStatementで実行 */
-  public int executeUpdate(String query, Object... params) throws SQLException {
-    PreparedStatement preparedStatement = prepareStatement(query, params);
-    return preparedStatement.executeUpdate();
-  }
-
-  /** 共通のPreparedStatement作成メソッド */
+  /** 共通のPreparedStatement作成メソッド SQLクエリに対応するパラメータを設定する */
   public PreparedStatement prepareStatement(String query, Object... params) throws SQLException {
     PreparedStatement preparedStatement = connection.prepareStatement(query);
     setParameters(preparedStatement, params);
@@ -51,7 +39,7 @@ public class PostgreSQLConnection {
   private void setParameters(PreparedStatement preparedStatement, Object... params) throws SQLException {
     System.out.println(preparedStatement.toString());
     System.out.println(Arrays.toString(params));
-    System.out.println("★★★★★★★★★★★★★★★★★★★");
+    System.out.println("🔥 🔥 🔥 🔥 🔥 🔥 🔥 🔥 🔥 🔥 🔥 🔥 🔥 🔥 🔥 🔥 🔥 🔥 🔥 🔥");
     for (int i = 0; i < params.length; i++) {
       Object value = params[i];
       if (value instanceof java.sql.Timestamp) {
@@ -66,6 +54,18 @@ public class PostgreSQLConnection {
         preparedStatement.setObject(i + 1, value); // インデックスは1から始まる
       }
     }
+  }
+
+  /** SELECT文をPreparedStatementで実行 */
+  public ResultSet executeQuery(String query, Object... params) throws SQLException {
+    PreparedStatement preparedStatement = prepareStatement(query, params);
+    return preparedStatement.executeQuery();
+  }
+
+  /** INSERT, UPDATE, DELETE 文をPreparedStatementで実行 */
+  public int executeUpdate(String query, Object... params) throws SQLException {
+    PreparedStatement preparedStatement = prepareStatement(query, params);
+    return preparedStatement.executeUpdate();
   }
 
   /** トランザクションのコミット */
